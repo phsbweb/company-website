@@ -30,11 +30,13 @@ function isActive($page)
     <header>
         <div class="container">
             <nav>
-                <a href="index.php" class="logo">Priority<span>Horizon</span></a>
+                <a href="index.php" class="logo"><img src="assets/images/PHSB logo.png" alt="Priority Horizon Logo" class="logo-img">Priority<span>Horizon</span></a>
 
                 <div class="menu-toggle" id="mobile-menu">
                     <i class="fas fa-bars"></i>
                 </div>
+
+                <div class="nav-overlay" id="nav-overlay"></div>
 
                 <ul class="nav-links">
                     <li><a href="index.php" class="<?php echo isActive('index'); ?>">Home</a></li>
@@ -46,3 +48,50 @@ function isActive($page)
             </nav>
         </div>
     </header>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const menuToggle = document.getElementById('mobile-menu');
+            const navLinks = document.querySelector('.nav-links');
+            const navOverlay = document.getElementById('nav-overlay');
+
+            if (menuToggle && navLinks && navOverlay) {
+                menuToggle.addEventListener('click', function() {
+                    navLinks.classList.toggle('active');
+                    navOverlay.classList.toggle('active');
+
+                    // Toggle icon between bars and times
+                    const icon = menuToggle.querySelector('i');
+                    if (navLinks.classList.contains('active')) {
+                        icon.classList.remove('fa-bars');
+                        icon.classList.add('fa-times');
+                        document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
+                    } else {
+                        icon.classList.remove('fa-times');
+                        icon.classList.add('fa-bars');
+                        document.body.style.overflow = '';
+                    }
+                });
+
+                // Close menu when clicking overlay
+                navOverlay.addEventListener('click', function() {
+                    navLinks.classList.remove('active');
+                    navOverlay.classList.remove('active');
+                    menuToggle.querySelector('i').classList.remove('fa-times');
+                    menuToggle.querySelector('i').classList.add('fa-bars');
+                    document.body.style.overflow = '';
+                });
+
+                // Close menu when clicking a link
+                navLinks.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', function() {
+                        navLinks.classList.remove('active');
+                        navOverlay.classList.remove('active');
+                        menuToggle.querySelector('i').classList.remove('fa-times');
+                        menuToggle.querySelector('i').classList.add('fa-bars');
+                        document.body.style.overflow = '';
+                    });
+                });
+            }
+        });
+    </script>

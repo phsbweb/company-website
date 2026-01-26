@@ -53,12 +53,7 @@ body {
 }
 
 /* Typography */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+h1, h2, h3, h4, h5, h6 {
   font-family: var(--font-heading);
   font-weight: 700;
   color: var(--text-main);
@@ -86,7 +81,7 @@ ul {
   display: inline-block;
   padding: 12px 32px;
   background: var(--accent-color);
-  color: #ffffff; /* White text on dark button */
+  color: #ffffff;
   font-weight: 600;
   border-radius: 50px;
   transition:
@@ -122,7 +117,7 @@ ul {
   background: var(--bg-card);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(0, 0, 0, 0.05); /* Darker border for light mode */
+  border: 1px solid rgba(0, 0, 0, 0.05);
   border-radius: var(--border-radius);
   box-shadow:
     0 4px 6px -1px rgba(0, 0, 0, 0.1),
@@ -159,6 +154,15 @@ nav {
   font-weight: 800;
   color: #171717; /* Dark Black Logo */
   letter-spacing: -0.02em;
+  display: flex;
+  align-items: center;
+  gap: 0; /* No space between logo and text */
+}
+
+.logo-img {
+  height: 55px;
+  width: auto;
+  object-fit: contain;
 }
 
 .logo span {

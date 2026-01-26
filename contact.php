@@ -94,7 +94,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <i class="fas fa-map-marker-alt" style="color: var(--accent-color); font-size: 1.5rem; width: 24px; text-align: center; margin-top: 4px;"></i>
                         <div>
                             <h4 style="margin-bottom: 5px;">Visit Us</h4>
-                            <p style="color: var(--text-muted);">No. 17, Jalan IMP 1/1, Pusat Teknologi Sinar Meranti,<br>Taman Industri Meranti Perdana,<br>47120 Puchong, Selangor Darul Ehsan.</p>
+                            <p style="color: var(--text-muted);">No. 17, Jalan IMP 1/1, <br>Pusat Teknologi Sinar Meranti,<br>Taman Industri Meranti Perdana,<br>47120 Puchong, Selangor Darul Ehsan.</p>
                         </div>
                     </div>
 

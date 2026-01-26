@@ -10,7 +10,7 @@ try {
         SELECT p.* 
         FROM projects p
         INNER JOIN featured_projects fp ON p.id = fp.project_id
-        ORDER BY fp.id DESC 
+        ORDER BY fp.slot ASC 
         LIMIT 3
     ");
     if ($stmt_feat) {
