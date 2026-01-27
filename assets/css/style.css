@@ -837,7 +837,7 @@ footer {
     opacity: 0;
     visibility: hidden;
     transition: all 0.3s ease;
-    backdrop-filter: blur(4px);
+    /* backdrop-filter: blur(4px); removed per user request */
   }
 
   .nav-overlay.active {
