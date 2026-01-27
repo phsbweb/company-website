@@ -74,84 +74,84 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <!-- Page Header -->
-<section style="padding: 150px 0 80px; text-align: center;">
+<section class="page-header">
     <div class="container">
-        <h1 class="ani-float-up" style="font-size: 3rem; margin-bottom: 20px;">Contact Us</h1>
-        <p class="ani-float-up ani-delay-2" style="color: var(--text-muted); max-width: 600px; margin: 0 auto;">Have a project in mind? Let's talk.</p>
+        <h1 class="ani-float-up page-title">Contact Us</h1>
+        <p class="ani-float-up ani-delay-2 page-subtitle">Have a project in mind? Let's talk.</p>
     </div>
 </section>
 
 <section class="section-padding">
     <div class="container">
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 60px;">
+        <div class="contact-grid">
 
             <!-- Contact Info -->
             <div>
-                <h2 style="margin-bottom: 30px;">Get in touch</h2>
+                <h2 class="mb-30">Get in touch</h2>
 
-                <div style="margin-bottom: 40px;">
-                    <div style="display: flex; gap: 20px; margin-bottom: 30px;">
-                        <i class="fas fa-map-marker-alt" style="color: var(--accent-color); font-size: 1.5rem; width: 24px; text-align: center; margin-top: 4px;"></i>
+                <div class="mb-40">
+                    <div class="contact-item">
+                        <i class="fas fa-map-marker-alt contact-icon"></i>
                         <div>
-                            <h4 style="margin-bottom: 5px;">Visit Us</h4>
-                            <p style="color: var(--text-muted);">No. 17, Jalan IMP 1/1, <br>Pusat Teknologi Sinar Meranti,<br>Taman Industri Meranti Perdana,<br>47120 Puchong, Selangor Darul Ehsan.</p>
+                            <h4 class="contact-label">Visit Us</h4>
+                            <p class="card-desc">No. 17, Jalan IMP 1/1, <br>Pusat Teknologi Sinar Meranti,<br>Taman Industri Meranti Perdana,<br>47120 Puchong, Selangor Darul Ehsan.</p>
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 20px; margin-bottom: 30px;">
-                        <i class="fas fa-envelope" style="color: var(--accent-color); font-size: 1.5rem; width: 24px; text-align: center; margin-top: 4px;"></i>
+                    <div class="contact-item">
+                        <i class="fas fa-envelope contact-icon"></i>
                         <div>
-                            <h4 style="margin-bottom: 5px;">Email Us</h4>
-                            <p style="color: var(--text-muted);">priorityhorizon@gmail.com</p>
+                            <h4 class="contact-label">Email Us</h4>
+                            <p class="card-desc">priorityhorizon@gmail.com</p>
                         </div>
                     </div>
 
-                    <div style="display: flex; gap: 20px;">
-                        <i class="fas fa-phone-alt" style="color: var(--accent-color); font-size: 1.5rem; width: 24px; text-align: center; margin-top: 4px;"></i>
+                    <div class="contact-item">
+                        <i class="fas fa-phone-alt contact-icon"></i>
                         <div>
-                            <h4 style="margin-bottom: 5px;">Call Us</h4>
-                            <p style="color: var(--text-muted);">+603-1234 5678<br>Mon-Fri, 9am - 6pm</p>
+                            <h4 class="contact-label">Call Us</h4>
+                            <p class="card-desc">+603-1234 5678<br>Mon-Fri, 9am - 6pm</p>
                         </div>
                     </div>
                 </div>
             </div>
 
             <!-- Contact Form -->
-            <div class="glass-card" style="padding: 40px;">
+            <div class="glass-card feature-card-padding">
                 <?php if ($success): ?>
-                    <div style="background: #ecfdf5; color: #065f46; padding: 20px; border-radius: 8px; margin-bottom: 20px; text-align: center; border: 1px solid #d1fae5;">
-                        <i class="fas fa-check-circle" style="margin-bottom: 10px; font-size: 2rem; display: block;"></i>
-                        <h4 style="margin-bottom: 5px;">Message Sent!</h4>
+                    <div class="alert-success">
+                        <i class="fas fa-check-circle mb-10" style="font-size: 2rem; display: block;"></i>
+                        <h4 class="mb-10">Message Sent!</h4>
                         <p style="font-size: 0.9rem;">Thank you for reaching out. We'll get back to you shortly.</p>
                     </div>
                 <?php endif; ?>
 
                 <?php if ($error): ?>
-                    <div style="background: #fef2f2; color: #991b1b; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; border: 1px solid #fee2e2;">
+                    <div class="alert-error">
                         <?php echo $error; ?>
                     </div>
                 <?php endif; ?>
 
                 <form action="contact.php" method="POST">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <label style="font-size: 0.9rem; font-weight: 500;">Name</label>
-                            <input type="text" name="name" placeholder="John Doe" required style="padding: 12px; background: #f4f4f4; border: 1px solid #f4f4f4; border-radius: 8px; color: #333; outline: none;">
+                    <div class="form-grid-2">
+                        <div class="form-group">
+                            <label class="form-label">Name</label>
+                            <input type="text" name="name" placeholder="John Doe" required class="form-input">
                         </div>
-                        <div style="display: flex; flex-direction: column; gap: 8px;">
-                            <label style="font-size: 0.9rem; font-weight: 500;">Email</label>
-                            <input type="email" name="email" placeholder="john@example.com" required style="padding: 12px; background: #f4f4f4; border: 1px solid #f4f4f4; border-radius: 8px; color: #333; outline: none;">
+                        <div class="form-group">
+                            <label class="form-label">Email</label>
+                            <input type="email" name="email" placeholder="john@example.com" required class="form-input">
                         </div>
                     </div>
 
-                    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px;">
-                        <label style="font-size: 0.9rem; font-weight: 500;">Subject</label>
-                        <input type="text" name="subject" placeholder="Inquiry" style="padding: 12px; background: #f4f4f4; border: 1px solid #f4f4f4; border-radius: 8px; color: #333; outline: none;">
+                    <div class="form-group mb-20">
+                        <label class="form-label">Subject</label>
+                        <input type="text" name="subject" placeholder="Inquiry" class="form-input">
                     </div>
 
-                    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 30px;">
-                        <label style="font-size: 0.9rem; font-weight: 500;">Message</label>
-                        <textarea name="message" rows="5" placeholder="Tell us about your topic..." required style="padding: 12px; background: #f4f4f4; border: 1px solid #f4f4f4; border-radius: 8px; color: #333; outline: none; resize: vertical;"></textarea>
+                    <div class="form-group mb-30">
+                        <label class="form-label">Message</label>
+                        <textarea name="message" rows="5" placeholder="Tell us about your topic..." required class="form-input form-textarea"></textarea>
                     </div>
 
                     <button type="submit" class="btn" style="width: 100%;">Send Message</button>
