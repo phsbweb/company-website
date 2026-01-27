@@ -30,7 +30,7 @@ function isActive($page)
     <header>
         <div class="container">
             <nav>
-                <a href="index.php" class="logo"><img src="assets/images/PHSB logo.png" alt="Priority Horizon Logo" class="logo-img">Priority<span>Horizon</span></a>
+                <a href="index.php" class="logo"><img src="assets/images/PHSB logo.png" alt="Priority Horizon Logo" class="logo-img">Priority Horizon</a>
 
                 <div class="menu-toggle" id="mobile-menu">
                     <i class="fas fa-bars"></i>
@@ -60,61 +60,38 @@ function isActive($page)
                     navLinks.classList.toggle('active');
                     navOverlay.classList.toggle('active');
 
+                    // Toggle icon between bars and times
                     const icon = menuToggle.querySelector('i');
-                    const header = document.querySelector('header');
-                    const hero = document.querySelector('.hero');
-
                     if (navLinks.classList.contains('active')) {
-                        // Open Menu
                         icon.classList.remove('fa-bars');
                         icon.classList.add('fa-times');
-
-                        // Prevent scrolling and compensate for scrollbar width
-                        const scrollbarWidth = window.innerWidth - document.documentElement.clientWidth;
-                        document.body.style.overflow = 'hidden';
-                        document.body.style.paddingRight = scrollbarWidth + 'px';
-                        if (header) header.style.paddingRight = scrollbarWidth + 'px';
-                        if (hero) hero.style.paddingRight = scrollbarWidth + 'px';
-
+                        document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
                     } else {
-                        // Close Menu
                         icon.classList.remove('fa-times');
                         icon.classList.add('fa-bars');
-
-                        // Restore scrolling and remove padding
                         document.body.style.overflow = '';
-                        document.body.style.paddingRight = '';
-                        if (header) header.style.paddingRight = '';
-                        if (hero) hero.style.paddingRight = '';
                     }
                 });
 
                 // Close menu when clicking overlay
                 navOverlay.addEventListener('click', function() {
-                    closeMenu();
+                    navLinks.classList.remove('active');
+                    navOverlay.classList.remove('active');
+                    menuToggle.querySelector('i').classList.remove('fa-times');
+                    menuToggle.querySelector('i').classList.add('fa-bars');
+                    document.body.style.overflow = '';
                 });
 
                 // Close menu when clicking a link
                 navLinks.querySelectorAll('a').forEach(link => {
                     link.addEventListener('click', function() {
-                        closeMenu();
+                        navLinks.classList.remove('active');
+                        navOverlay.classList.remove('active');
+                        menuToggle.querySelector('i').classList.remove('fa-times');
+                        menuToggle.querySelector('i').classList.add('fa-bars');
+                        document.body.style.overflow = '';
                     });
                 });
-
-                function closeMenu() {
-                    navLinks.classList.remove('active');
-                    navOverlay.classList.remove('active');
-                    menuToggle.querySelector('i').classList.remove('fa-times');
-                    menuToggle.querySelector('i').classList.add('fa-bars');
-
-                    // Restore scrolling and padding
-                    document.body.style.overflow = '';
-                    document.body.style.paddingRight = '';
-                    const header = document.querySelector('header');
-                    const hero = document.querySelector('.hero');
-                    if (header) header.style.paddingRight = '';
-                    if (hero) hero.style.paddingRight = '';
-                }
             }
         });
     </script>

@@ -44,7 +44,10 @@
   color: #a3a3a3;
 }
 
-
+html {
+  -webkit-text-size-adjust: 100%; /* Prevent iOS text inflation */
+  text-size-adjust: 100%;
+}
 
 body {
   font-family: var(--font-body);
@@ -70,6 +73,11 @@ a {
   text-decoration: none;
   color: inherit;
   transition: all 0.3s ease;
+}
+
+img, video {
+  max-width: 100%;
+  height: auto;
 }
 
 ul {
@@ -651,55 +659,6 @@ footer {
   color: #ffffff;
 }
 
-/* Organization Chart Styling */
-.org-chart-container {
-    padding: 20px 0;
-    margin-bottom: 80px;
-    overflow-x: auto;
-    text-align: center;
-}
-
-.org-tree {
-    display: inline-flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 100%;
-}
-
-.org-node {
-    padding: 12px 15px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-    min-width: 170px;
-    min-height: 85px;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    line-height: 1.3;
-    position: relative;
-    border: 1px solid rgba(0,0,0,0.05);
-}
-
-.org-node h4, 
-.org-node p {
-    color: inherit;
-}
-
-.org-node h4 {
-    font-size: 0.8rem;
-    margin-bottom: 4px;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    font-weight: 800;
-}
-
-.org-node p {
-    font-size: 0.95rem;
-    font-weight: 600;
-    margin: 0;
-}
-
 /* Colors from Image - Refined to Grey/White Theme with Higher Contrast */
 .node-board { background-color: #0c0a09; color: #f5f5f5; border-color: #000000; } /* Near-black with Light Grey Text */
 .node-advisor { background-color: #262626; color: #e5e5e5; border-color: #171717; } /* Solid Dark Grey with Lighter Grey Text */
@@ -797,7 +756,7 @@ footer {
     border-bottom: 1px solid rgba(0,0,0,0.05); /* Divider */
     padding-bottom: 15px;
   }
-  
+
   .nav-links li:last-child {
       border-bottom: none;
   }
@@ -925,9 +884,17 @@ footer {
       bottom: auto;
       left: auto;
       transform: none;
-      margin-top: 30px;
-      animation: bounce 2s infinite; /* Keep bounce, remove floatUpCentered which affects position */
-      opacity: 1; /* Ensure visible since we removed floatUp animation */
+      display: block; /* Ensure block for margin auto */
+      width: fit-content;
+      margin: 30px auto; /* Center horizontal */
+      animation: floatUp 1.2s ease-out 1s forwards, bounceMobile 2s infinite 2.2s;
+      opacity: 0; 
+  }
+  
+  @keyframes bounceMobile {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
   }
   
   /* Fix Menu Alignment: Absolute positioning to overlay header */
@@ -952,11 +919,119 @@ footer {
   }
   
   .org-chart-container::after {
-      content: 'Scroll to see more →';
+      /* content: 'Scroll to see more →'; */
       display: block;
       margin-top: 10px;
       font-size: 0.8rem;
       color: var(--text-muted);
       font-style: italic;
+  }
+}
+
+/* Small Devices (iPhone SE, iPhone X, etc) */
+@media (max-width: 480px) {
+  /* Global Scaling via Root Font Size */
+  html {
+    font-size: 14px; /* Scales down all rem-based sizes */
+  }
+
+  .container {
+    padding: 0 15px; /* Tighter container */
+  }
+
+  /* Compact Header & Logo */
+  :root {
+    --header-height: 60px; /* Force smaller header variable */
+  }
+  
+  header {
+    height: 60px; /* Keep overall compact height */
+    padding-top: 15px; /* More space above content "bringing it down" */
+  }
+  
+  .logo-img {
+    height: 30px; /* Even smaller logo */
+  }
+  
+  .logo {
+    font-size: 1rem; /* Smaller text */
+  }
+
+  /* Compact Sections */
+  .section-padding { 
+    padding: 40px 0; /* Significant reduction from 100px/60px */
+  }
+  
+  .page-header { 
+    padding: 100px 0 40px; /* Tighter top spacing */
+  }
+
+  /* Hero Adjustments */
+  .hero h1 {
+    font-size: 1.5rem !important; 
+    margin-bottom: 10px !important;
+  }
+  
+  .hero p {
+      font-size: 0.9rem !important;
+      margin-bottom: 20px !important;
+      max-width: 90%; /* Ensure text doesn't hit edges */
+  }
+  
+  .btn {
+      padding: 8px 20px;
+      font-size: 0.85rem;
+  }
+
+  /* Footer Compaction */
+  footer {
+    padding: 30px 0 15px;
+  }
+  
+  .footer-content {
+    gap: 25px;
+    margin-bottom: 20px;
+  }
+  
+  .footer-logo {
+    font-size: 1.2rem;
+  }
+  
+  /* Images & Cards */
+  .glass-card {
+    padding: 20px !important; /* Reduce internal card padding */
+  }
+
+  /* Smaller Menu Toggle */
+  .menu-toggle {
+      width: 24px;
+      height: 24px;
+      line-height: 24px;
+      font-size: 1.1rem; /* Smaller icon */
+  }
+
+  /* Compact Menu Drawer */
+  .nav-links {
+      width: 160px; /* Thinner drawer */
+      padding: 80px 15px 20px; /* Slightly less padding */
+  }
+
+  .nav-links a {
+      font-size: 1rem; /* Smaller menu text */
+  }
+  
+  .nav-links li {
+      margin-bottom: 20px; /* Less space between links */
+      padding-bottom: 10px;
+  }
+
+  /* Smaller Scroll-To-Top Button */
+  .scroll-top-btn {
+      width: 35px;
+      height: 35px;
+      line-height: 35px;
+      font-size: 1rem;
+      right: 15px;
+      bottom: 15px;
   }
 }
