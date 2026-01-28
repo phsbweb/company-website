@@ -1,30 +1,77 @@
 <?php
 session_start();
 include '../includes/db.php';
+require '../includes/mail_config.php';
+require '../includes/PHPMailer/Exception.php';
+require '../includes/PHPMailer/PHPMailer.php';
+require '../includes/PHPMailer/SMTP.php';
+
+use PHPMailer\PHPMailer\PHPMailer;
+use PHPMailer\PHPMailer\Exception;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
 
-    if (!empty($username) && !empty($password)) {
+    if (!empty($username)) {
         try {
+            // Check if admin user exists
             $stmt = $pdo->prepare("SELECT * FROM admin_users WHERE username = ?");
             $stmt->execute([$username]);
             $user = $stmt->fetch();
 
-            if ($user && password_verify($password, $user['password'])) {
-                $_SESSION['admin_logged_in'] = true;
-                $_SESSION['admin_username'] = $user['username'];
-                header('Location: dashboard.php');
-                exit;
+            if ($user) {
+                // Generate OTP
+                $otp = sprintf("%06d", mt_rand(0, 999999));
+                $expires_at = date('Y-m-d H:i:s', strtotime('+15 minutes'));
+
+                // Save OTP to the NEW separate table
+                // First, clear any existing codes for this username to keep it clean
+                $clearStmt = $pdo->prepare("DELETE FROM admin_password_resets WHERE username = ?");
+                $clearStmt->execute([$username]);
+
+                $insertStmt = $pdo->prepare("INSERT INTO admin_password_resets (username, otp_code, otp_expires_at) VALUES (?, ?, ?)");
+                $insertStmt->execute([$username, $otp, $expires_at]);
+
+                // Send Email to COMPANY email (SMTP_USER)
+                $mail = new PHPMailer(true);
+                try {
+                    $mail->isSMTP();
+                    $mail->Host       = SMTP_HOST;
+                    $mail->SMTPAuth   = true;
+                    $mail->Username   = SMTP_USER;
+                    $mail->Password   = SMTP_PASS;
+                    $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+                    $mail->Port       = SMTP_PORT;
+
+                    $mail->setFrom(SMTP_FROM, SMTP_FROM_NAME);
+                    $mail->addAddress(SMTP_USER); // Centered company email
+
+                    $mail->isHTML(true);
+                    $mail->Subject = 'Admin Password Reset OTP';
+                    $mail->Body    = "
+                        <h3>Password Reset Request</h3>
+                        <p>An administrator (<strong>$username</strong>) has requested to reset their password. Your OTP code is:</p>
+                        <h2 style='letter-spacing: 5px; background: #f4f4f4; padding: 10px; display: inline-block;'>$otp</h2>
+                        <p>This code will expire in 15 minutes.</p>
+                        <p>If you did not request this, please ignore this email.</p>
+                    ";
+                    $mail->AltBody = "An administrator ($username) requested a password reset. Your OTP code is: $otp. It expires in 15 minutes.";
+
+                    $mail->send();
+                    $_SESSION['reset_username'] = $username;
+                    header('Location: verify-otp.php');
+                    exit;
+                } catch (Exception $e) {
+                    $error = "Error sending OTP: " . $mail->ErrorInfo;
+                }
             } else {
-                $error = "Invalid username or password.";
+                $error = "Username not found.";
             }
         } catch (PDOException $e) {
             $error = "Database error: " . $e->getMessage();
         }
     } else {
-        $error = "Please enter both username and password.";
+        $error = "Please enter your username.";
     }
 }
 ?>
@@ -34,8 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - Priority Horizon</title>
-    <!-- Font Awesome -->
+    <title>Forgot Password - Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -49,7 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
@@ -154,21 +200,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body>
-
     <div class="login-card">
-        <div class="logo">Priority<span>Horizon</span> Admin</div>
+        <div class="logo">Forgot <span>Password</span></div>
+        <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 25px;">Enter your username to receive an OTP on the company email.</p>
 
         <?php if (isset($error)): ?>
             <div class="error-msg"><?php echo $error; ?></div>
-        <?php endif; ?>
-
-        <?php if (isset($_SESSION['success_msg'])): ?>
-            <div style="background: #ecfdf5; color: #065f46; padding: 10px; border-radius: 6px; margin-bottom: 20px; font-size: 0.85rem; text-align: center; border: 1px solid #d1fae5;">
-                <?php
-                echo $_SESSION['success_msg'];
-                unset($_SESSION['success_msg']);
-                ?>
-            </div>
         <?php endif; ?>
 
         <form method="POST">
@@ -176,21 +213,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <label for="username">Username</label>
                 <input type="text" id="username" name="username" placeholder="Enter username" required>
             </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Enter password" required>
-                <div style="text-align: right; margin-top: 5px;">
-                    <a href="forgot-password.php" style="font-size: 0.8rem; color: var(--text-muted); text-decoration: none;">Forgot Password?</a>
-                </div>
-            </div>
-            <button type="submit" class="btn-login">Login</button>
+            <button type="submit" class="btn-login">Send OTP</button>
         </form>
 
         <div class="back-to-site">
-            <a href="../index.php"><i class="fas fa-arrow-left"></i> Back to Website</a>
+            <a href="login.php"><i class="fas fa-arrow-left"></i> Back to Login</a>
         </div>
     </div>
-
 </body>
 
 </html>

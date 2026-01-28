@@ -2,29 +2,39 @@
 session_start();
 include '../includes/db.php';
 
+if (!isset($_SESSION['reset_username'])) {
+    header('Location: forgot-password.php');
+    exit;
+}
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $username = $_POST['username'] ?? '';
-    $password = $_POST['password'] ?? '';
+    $otp = $_POST['otp'] ?? '';
+    $username = $_SESSION['reset_username'];
 
-    if (!empty($username) && !empty($password)) {
+    if (!empty($otp)) {
         try {
-            $stmt = $pdo->prepare("SELECT * FROM admin_users WHERE username = ?");
-            $stmt->execute([$username]);
-            $user = $stmt->fetch();
+            // Check OTP in the NEW separate table
+            $stmt = $pdo->prepare("SELECT * FROM admin_password_resets WHERE username = ? AND otp_code = ?");
+            $stmt->execute([$username, $otp]);
+            $reset = $stmt->fetch();
 
-            if ($user && password_verify($password, $user['password'])) {
-                $_SESSION['admin_logged_in'] = true;
-                $_SESSION['admin_username'] = $user['username'];
-                header('Location: dashboard.php');
-                exit;
+            if ($reset) {
+                $now = date('Y-m-d H:i:s');
+                if ($reset['otp_expires_at'] > $now) {
+                    $_SESSION['otp_verified'] = true;
+                    header('Location: reset-password.php');
+                    exit;
+                } else {
+                    $error = "OTP has expired. Please request a new one.";
+                }
             } else {
-                $error = "Invalid username or password.";
+                $error = "Invalid OTP code.";
             }
         } catch (PDOException $e) {
             $error = "Database error: " . $e->getMessage();
         }
     } else {
-        $error = "Please enter both username and password.";
+        $error = "Please enter the OTP.";
     }
 }
 ?>
@@ -34,8 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login - Priority Horizon</title>
-    <!-- Font Awesome -->
+    <title>Verify OTP - Admin</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -49,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            font-family: 'Inter', sans-serif;
         }
 
         body {
@@ -103,6 +112,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             outline: none;
             transition: border-color 0.2s;
             background: #fafafa;
+            text-align: center;
+            letter-spacing: 5px;
+            font-size: 1.2rem;
+            font-weight: bold;
         }
 
         .form-group input:focus {
@@ -154,43 +167,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body>
-
     <div class="login-card">
-        <div class="logo">Priority<span>Horizon</span> Admin</div>
+        <div class="logo">Verify <span>OTP</span></div>
+        <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 25px;">Enter the 6-digit code sent to the company email.</p>
 
         <?php if (isset($error)): ?>
             <div class="error-msg"><?php echo $error; ?></div>
         <?php endif; ?>
 
-        <?php if (isset($_SESSION['success_msg'])): ?>
-            <div style="background: #ecfdf5; color: #065f46; padding: 10px; border-radius: 6px; margin-bottom: 20px; font-size: 0.85rem; text-align: center; border: 1px solid #d1fae5;">
-                <?php
-                echo $_SESSION['success_msg'];
-                unset($_SESSION['success_msg']);
-                ?>
-            </div>
-        <?php endif; ?>
-
         <form method="POST">
             <div class="form-group">
-                <label for="username">Username</label>
-                <input type="text" id="username" name="username" placeholder="Enter username" required>
+                <label for="otp">OTP Code</label>
+                <input type="text" id="otp" name="otp" placeholder="000000" maxlength="6" required autocomplete="off">
             </div>
-            <div class="form-group">
-                <label for="password">Password</label>
-                <input type="password" id="password" name="password" placeholder="Enter password" required>
-                <div style="text-align: right; margin-top: 5px;">
-                    <a href="forgot-password.php" style="font-size: 0.8rem; color: var(--text-muted); text-decoration: none;">Forgot Password?</a>
-                </div>
-            </div>
-            <button type="submit" class="btn-login">Login</button>
+            <button type="submit" class="btn-login">Verify OTP</button>
         </form>
 
         <div class="back-to-site">
-            <a href="../index.php"><i class="fas fa-arrow-left"></i> Back to Website</a>
+            <a href="forgot-password.php"><i class="fas fa-redo"></i> Resend OTP</a>
         </div>
     </div>
-
 </body>
 
 </html>
