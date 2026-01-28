@@ -30,7 +30,7 @@ function isActive($page)
     <header>
         <div class="container">
             <nav>
-                <a href="index.php" class="logo"><img src="assets/images/PHSB logo.png" alt="Priority Horizon Logo" class="logo-img">Priority<span>Horizon</span></a>
+                <a href="index.php" class="logo"><img src="assets/images/PHSB logo.png" alt="Priority Horizon Logo" class="logo-img">Priority Horizon</a>
 
                 <div class="menu-toggle" id="mobile-menu">
                     <i class="fas fa-bars"></i>

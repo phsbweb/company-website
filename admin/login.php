@@ -162,6 +162,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="error-msg"><?php echo $error; ?></div>
         <?php endif; ?>
 
+        <?php if (isset($_SESSION['success_msg'])): ?>
+            <div style="background: #ecfdf5; color: #065f46; padding: 10px; border-radius: 6px; margin-bottom: 20px; font-size: 0.85rem; text-align: center; border: 1px solid #d1fae5;">
+                <?php
+                echo $_SESSION['success_msg'];
+                unset($_SESSION['success_msg']);
+                ?>
+            </div>
+        <?php endif; ?>
+
         <form method="POST">
             <div class="form-group">
                 <label for="username">Username</label>
@@ -170,6 +179,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="form-group">
                 <label for="password">Password</label>
                 <input type="password" id="password" name="password" placeholder="Enter password" required>
+                <div style="text-align: right; margin-top: 5px;">
+                    <a href="forgot-password.php" style="font-size: 0.8rem; color: var(--text-muted); text-decoration: none;">Forgot Password?</a>
+                </div>
             </div>
             <button type="submit" class="btn-login">Login</button>
         </form>
