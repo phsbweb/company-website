@@ -1,6 +1,6 @@
 <?php
 include 'auth.php';
-include '../includes/db.php';
+include '../user/profile_page/includes/db.php';
 
 $projects = [];
 $error = false;

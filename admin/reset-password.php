@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../includes/db.php';
+include '../user/profile_page/includes/db.php';
 
 if (!isset($_SESSION['otp_verified']) || !isset($_SESSION['reset_username'])) {
     header('Location: forgot-password.php');

@@ -1,6 +1,6 @@
 <?php
 include 'auth.php';
-include '../includes/db.php';
+include '../user/profile_page/includes/db.php';
 
 $id = $_GET['id'] ?? null;
 if (!$id) {
@@ -36,7 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle Image Upload
     $image_path = $project['image_path'];
     if (isset($_FILES['project_image']) && $_FILES['project_image']['error'] === UPLOAD_ERR_OK) {
-        $upload_dir = '../assets/images/projects/';
+        $upload_dir = '../user/profile_page/assets/images/projects/';
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0777, true);
         }
@@ -46,8 +46,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if (move_uploaded_file($_FILES['project_image']['tmp_name'], $target_file)) {
             // Delete old image if it exists
-            if ($image_path && file_exists('../' . $image_path)) {
-                unlink('../' . $image_path);
+            if ($image_path && file_exists('../user/profile_page/' . $image_path)) {
+                unlink('../user/profile_page/' . $image_path);
             }
             $image_path = 'assets/images/projects/' . $file_name;
         }
@@ -266,7 +266,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <label>Project Image</label>
                         <?php if ($project['image_path']): ?>
                             <div style="margin-bottom: 15px;">
-                                <img src="../<?php echo htmlspecialchars($project['image_path']); ?>" alt="Current Project Image" style="width: 150px; border-radius: 8px; border: 1px solid var(--border-color);">
+                                <img src="../user/profile_page/<?php echo htmlspecialchars($project['image_path']); ?>" alt="Current Project Image" style="width: 150px; border-radius: 8px; border: 1px solid var(--border-color);">
                                 <p style="font-size: 0.75rem; color: #737373;">Current image. Uploading a new one will replace it.</p>
                             </div>
                         <?php endif; ?>

@@ -1,5 +1,5 @@
 <?php
-include '../includes/db.php';
+include '../user/profile_page/includes/db.php';
 
 $success = false;
 $error = false;

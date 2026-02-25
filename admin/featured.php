@@ -1,6 +1,6 @@
 <?php
 include 'auth.php';
-include '../includes/db.php';
+include '../user/profile_page/includes/db.php';
 
 // Handle updating featured projects
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

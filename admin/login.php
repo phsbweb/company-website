@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../includes/db.php';
+include '../user/profile_page/includes/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
@@ -187,7 +187,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </form>
 
         <div class="back-to-site">
-            <a href="../index.php"><i class="fas fa-arrow-left"></i> Back to Website</a>
+            <a href="../user/profile_page/index.php"><i class="fas fa-arrow-left"></i> Back to Website</a>
         </div>
     </div>
 

@@ -1,4 +1,4 @@
-    <footer>
+    <footer class="snap-section">
         <div class="container">
             <div class="footer-content">
                 <div class="footer-info">

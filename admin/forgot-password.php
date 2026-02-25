@@ -1,10 +1,10 @@
 <?php
 session_start();
-include '../includes/db.php';
-require '../includes/mail_config.php';
-require '../includes/PHPMailer/Exception.php';
-require '../includes/PHPMailer/PHPMailer.php';
-require '../includes/PHPMailer/SMTP.php';
+include '../user/profile_page/includes/db.php';
+require '../user/profile_page/includes/mail_config.php';
+require '../user/profile_page/includes/PHPMailer/Exception.php';
+require '../user/profile_page/includes/PHPMailer/PHPMailer.php';
+require '../user/profile_page/includes/PHPMailer/SMTP.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;

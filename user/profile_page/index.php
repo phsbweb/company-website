@@ -33,7 +33,7 @@ if (empty($projects)) {
 ?>
 
 <!-- Hero Section -->
-<section class="hero">
+<section class="hero snap-section">
     <div class="container">
         <h1 style="font-size: 3.5rem; margin-bottom: 20px; background: linear-gradient(to right, #171717, #525252); background-clip: text; -webkit-background-clip: text; -webkit-text-fill-color: transparent;">
             Building the Future <br> with Excellence & Integrity
@@ -53,7 +53,7 @@ if (empty($projects)) {
 
 <main class="main-content" id="main-content">
     <!-- Features / Services Teaser -->
-    <section class="section-padding">
+    <section class="section-padding snap-section">
         <div class="container">
             <div class="features-intro">
                 <h2 class="section-title">Why Choose Priority Horizon?</h2>
@@ -94,7 +94,7 @@ if (empty($projects)) {
     </section>
 
     <!-- Featured Projects Section -->
-    <section class="section-padding">
+    <section class="section-padding snap-section">
         <div class="container">
             <h2 class="section-title text-center mb-40">Featured Projects</h2>
             <div class="common-grid-3">
@@ -123,7 +123,7 @@ if (empty($projects)) {
     </section>
 
     <!-- CTA Section -->
-    <section class="section-padding cta-section">
+    <section class="section-padding cta-section snap-section">
         <div class="container text-center">
             <h2 class="section-title mb-20">Ready to build your next project?</h2>
             <p class="card-desc mb-40">Partner with Priority Horizon for reliability and construction excellence.</p>
@@ -133,59 +133,3 @@ if (empty($projects)) {
 
     <?php include 'includes/footer.php'; ?>
 </main>
-
-<script>
-    function updateHeroOpacity() {
-        const hero = document.querySelector('.hero');
-        if (!hero) return;
-
-        const scrollPos = window.scrollY;
-        const heroHeight = hero.offsetHeight;
-
-        // Calculate opacity (reaches 0 when scrolled halfway through heroHeight)
-        let opacity = 1 - (scrollPos / (heroHeight / 2));
-
-        // Clamp opacity between 0 and 1
-        if (opacity < 0) opacity = 0;
-        if (opacity > 1) opacity = 1;
-
-        hero.style.opacity = opacity;
-    }
-
-    window.addEventListener('scroll', updateHeroOpacity);
-    window.addEventListener('DOMContentLoaded', function() {
-        updateHeroOpacity();
-
-        // Custom smooth scroll for the arrow
-        const arrow = document.querySelector('.scroll-down-arrow');
-        const target = document.querySelector('#main-content');
-
-        if (arrow && target) {
-            arrow.addEventListener('click', function(e) {
-                e.preventDefault();
-                const targetPosition = target.getBoundingClientRect().top + window.pageYOffset;
-                const startPosition = window.pageYOffset;
-                const distance = targetPosition - startPosition;
-                const duration = 1200; // Slower duration (1.2 seconds)
-                let start = null;
-
-                window.requestAnimationFrame(step);
-
-                function step(timestamp) {
-                    if (!start) start = timestamp;
-                    const progress = timestamp - start;
-                    window.scrollTo(0, ease(progress, startPosition, distance, duration));
-                    if (progress < duration) window.requestAnimationFrame(step);
-                }
-
-                // Quadratic easing - change this for different effects
-                function ease(t, b, c, d) {
-                    t /= d / 2;
-                    if (t < 1) return c / 2 * t * t + b;
-                    t--;
-                    return -c / 2 * (t * (t - 2) - 1) + b;
-                }
-            });
-        }
-    });
-</script>

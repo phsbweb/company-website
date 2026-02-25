@@ -1,6 +1,6 @@
 <?php
 include 'auth.php';
-include '../includes/db.php';
+include '../user/profile_page/includes/db.php';
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
