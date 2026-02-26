@@ -186,6 +186,7 @@ $featured_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
             <li><a href="dashboard.php"><i class="fas fa-th-large"></i> Dashboard</a></li>
             <li><a href="projects.php"><i class="fas fa-project-diagram"></i> Projects</a></li>
             <li><a href="featured.php" class="active"><i class="fas fa-star"></i> Featured</a></li>
+            <li><a href="attendance.php"><i class="fas fa-user-check"></i> Attendance</a></li>
         </ul>
     </div>
     <div class="main-content">

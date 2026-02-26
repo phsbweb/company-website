@@ -4,9 +4,23 @@ include '../user/profile_page/includes/db.php';
 
 // Fetch stats with error handling
 $projectsCount = 0;
+$attendanceCount = 0;
 
 try {
     $projectsCount = $pdo->query("SELECT COUNT(*) FROM projects")->fetchColumn();
+
+    // Connect to attendance DB for daily stats
+    $att_host = 'localhost';
+    $att_db   = 'phsb';
+    $att_user = 'root';
+    $att_pass = '';
+    $att_dsn = "mysql:host=$att_host;dbname=$att_db;charset=utf8mb4";
+    $att_pdo = new PDO($att_dsn, $att_user, $att_pass, [
+        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
+    ]);
+
+    $attendanceCount = $att_pdo->query("SELECT COUNT(*) FROM attendance WHERE DATE(created_at) = CURDATE()")->fetchColumn();
 } catch (Exception $e) {
     // Keep 0 if failed
 }
@@ -176,6 +190,7 @@ try {
             <li><a href="dashboard.php" class="active"><i class="fas fa-th-large"></i> Dashboard</a></li>
             <li><a href="projects.php"><i class="fas fa-project-diagram"></i> Projects</a></li>
             <li><a href="featured.php"><i class="fas fa-star"></i> Featured</a></li>
+            <li><a href="attendance.php"><i class="fas fa-user-check"></i> Attendance</a></li>
         </ul>
         <div class="logout-btn">
             <a href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a>
@@ -207,6 +222,13 @@ try {
                 <div class="stat-info">
                     <h3>Total Projects</h3>
                     <p><?php echo $projectsCount; ?></p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon"><i class="fas fa-user-check"></i></div>
+                <div class="stat-info">
+                    <h3>Checked In Today</h3>
+                    <p><?php echo $attendanceCount; ?></p>
                 </div>
             </div>
         </div>

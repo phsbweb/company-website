@@ -234,6 +234,7 @@ try {
             <li><a href="dashboard.php"><i class="fas fa-th-large"></i> Dashboard</a></li>
             <li><a href="projects.php" class="active"><i class="fas fa-project-diagram"></i> Projects</a></li>
             <li><a href="featured.php"><i class="fas fa-star"></i> Featured</a></li>
+            <li><a href="attendance.php"><i class="fas fa-user-check"></i> Attendance</a></li>
         </ul>
         <div class="logout-btn">
             <a href="logout.php" style="color: #991b1b; text-decoration: none; display: flex; align-items: center; padding: 12px 15px;"><i class="fas fa-sign-out-alt"></i> Logout</a>

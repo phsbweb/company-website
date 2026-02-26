@@ -51,7 +51,7 @@ html {
 
 @media (min-width: 769px) {
   html {
-    scroll-snap-type: y proximity;
+    scroll-snap-type: y mandatory;
   }
 }
 
