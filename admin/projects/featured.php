@@ -1,6 +1,6 @@
 <?php
-include 'auth.php';
-include '../user/profile_page/includes/db.php';
+include '../shared/auth.php';
+include '../../user/profile_page/includes/db.php';
 
 // Handle updating featured projects
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -47,84 +47,10 @@ $featured_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Featured Projects - Priority Horizon Admin</title>
+    <link rel="stylesheet" href="../shared/style.css">
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --sidebar-width: 260px;
-            --accent-color: #171717;
-            --bg-light: #fafafa;
-            --border-color: #e5e5e5;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-light);
-            display: flex;
-        }
-
-        .sidebar {
-            width: var(--sidebar-width);
-            background: #ffffff;
-            height: 100vh;
-            border-right: 1px solid var(--border-color);
-            position: fixed;
-            padding: 30px 20px;
-        }
-
-        .sidebar-logo {
-            font-size: 1.25rem;
-            font-weight: 800;
-            margin-bottom: 40px;
-            padding: 0 10px;
-        }
-
-        .nav-links {
-            list-style: none;
-        }
-
-        .nav-links a {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            color: #525252;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.2s;
-            font-size: 0.95rem;
-        }
-
-        .nav-links a i {
-            margin-right: 12px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .nav-links a.active,
-        .nav-links a:hover {
-            background: #f5f5f5;
-            color: var(--accent-color);
-        }
-
-        .main-content {
-            margin-left: var(--sidebar-width);
-            flex-grow: 1;
-            padding: 40px;
-        }
-
-        .admin-card {
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            max-width: 1000px;
-        }
-
         .project-list {
             margin-top: 20px;
         }
@@ -157,38 +83,15 @@ $featured_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
             cursor: pointer;
             margin-top: 30px;
         }
-
-        .alert {
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border: 1px solid transparent;
-        }
-
-        .alert-success {
-            background: #f0fdf4;
-            color: #166534;
-            border-color: #bbf7d0;
-        }
-
-        .alert-error {
-            background: #fef2f2;
-            color: #991b1b;
-            border-color: #fee2e2;
-        }
     </style>
 </head>
 
 <body>
-    <div class="sidebar">
-        <div class="sidebar-logo">PHSB Admin</div>
-        <ul class="nav-links">
-            <li><a href="dashboard.php"><i class="fas fa-th-large"></i> Dashboard</a></li>
-            <li><a href="projects.php"><i class="fas fa-project-diagram"></i> Projects</a></li>
-            <li><a href="featured.php" class="active"><i class="fas fa-star"></i> Featured</a></li>
-            <li><a href="attendance.php"><i class="fas fa-user-check"></i> Attendance</a></li>
-        </ul>
-    </div>
+    <?php
+    $activePage = 'featured';
+    $baseUrl = '../';
+    include '../shared/sidebar.php';
+    ?>
     <div class="main-content">
         <h1 style="font-size: 1.75rem; margin-bottom: 10px;">Featured Projects</h1>
         <p style="color: #737373; margin-bottom: 30px;">Select exactly 3 projects to display on the homepage.</p>

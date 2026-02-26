@@ -1,46 +1,30 @@
 <?php
 session_start();
-include '../user/profile_page/includes/db.php';
-
-if (!isset($_SESSION['otp_verified']) || !isset($_SESSION['reset_username'])) {
-    header('Location: forgot-password.php');
-    exit;
-}
+include '../../user/profile_page/includes/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
-    $confirm_password = $_POST['confirm_password'] ?? '';
-    $username = $_SESSION['reset_username'];
 
-    if (!empty($password) && !empty($confirm_password)) {
-        if ($password === $confirm_password) {
-            $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-            try {
-                // 1. Update the admin password
-                $stmt = $pdo->prepare("UPDATE admin_users SET password = ? WHERE username = ?");
-                if ($stmt->execute([$hashed_password, $username])) {
+    if (!empty($username) && !empty($password)) {
+        try {
+            $stmt = $pdo->prepare("SELECT * FROM admin_users WHERE username = ?");
+            $stmt->execute([$username]);
+            $user = $stmt->fetch();
 
-                    // 2. Clear the OTP from the SEPARATE table
-                    $clearStmt = $pdo->prepare("DELETE FROM admin_password_resets WHERE username = ?");
-                    $clearStmt->execute([$username]);
-
-                    // Success - Clear session
-                    session_destroy();
-                    session_start();
-                    $_SESSION['success_msg'] = "Password reset successful! You can now log in.";
-                    header('Location: login.php');
-                    exit;
-                } else {
-                    $error = "Failed to update password.";
-                }
-            } catch (PDOException $e) {
-                $error = "Database error: " . $e->getMessage();
+            if ($user && password_verify($password, $user['password'])) {
+                $_SESSION['admin_logged_in'] = true;
+                $_SESSION['admin_username'] = $user['username'];
+                header('Location: ../dashboard/dashboard.php');
+                exit;
+            } else {
+                $error = "Invalid username or password.";
             }
-        } else {
-            $error = "Passwords do not match.";
+        } catch (PDOException $e) {
+            $error = "Database error: " . $e->getMessage();
         }
     } else {
-        $error = "Please fill in all fields.";
+        $error = "Please enter both username and password.";
     }
 }
 ?>
@@ -50,7 +34,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Reset Password - Admin</title>
+    <title>Admin Login - Priority Horizon</title>
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         :root {
@@ -64,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
         }
 
         body {
@@ -150,30 +135,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             text-align: center;
             border: 1px solid #fee2e2;
         }
+
+        .back-to-site {
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .back-to-site a {
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.85rem;
+        }
+
+        .back-to-site a:hover {
+            color: var(--accent-color);
+        }
     </style>
 </head>
 
 <body>
+
     <div class="login-card">
-        <div class="logo">Reset <span>Password</span></div>
-        <p style="text-align: center; color: var(--text-muted); font-size: 0.85rem; margin-bottom: 25px;">Enter a new secure password for your account.</p>
+        <div class="logo">Priority<span>Horizon</span> Admin</div>
 
         <?php if (isset($error)): ?>
             <div class="error-msg"><?php echo $error; ?></div>
         <?php endif; ?>
 
+        <?php if (isset($_SESSION['success_msg'])): ?>
+            <div style="background: #ecfdf5; color: #065f46; padding: 10px; border-radius: 6px; margin-bottom: 20px; font-size: 0.85rem; text-align: center; border: 1px solid #d1fae5;">
+                <?php
+                echo $_SESSION['success_msg'];
+                unset($_SESSION['success_msg']);
+                ?>
+            </div>
+        <?php endif; ?>
+
         <form method="POST">
             <div class="form-group">
-                <label for="password">New Password</label>
-                <input type="password" id="password" name="password" placeholder="Enter new password" required minlength="6">
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username" placeholder="Enter username" required>
             </div>
             <div class="form-group">
-                <label for="confirm_password">Confirm New Password</label>
-                <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirm new password" required minlength="6">
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password" placeholder="Enter password" required>
+                <div style="text-align: right; margin-top: 5px;">
+                    <a href="forgot-password.php" style="font-size: 0.8rem; color: var(--text-muted); text-decoration: none;">Forgot Password?</a>
+                </div>
             </div>
-            <button type="submit" class="btn-login">Reset Password</button>
+            <button type="submit" class="btn-login">Login</button>
         </form>
+
+        <div class="back-to-site">
+            <a href="../../user/profile_page/index.php"><i class="fas fa-arrow-left"></i> Back to Website</a>
+        </div>
     </div>
+
 </body>
 
 </html>

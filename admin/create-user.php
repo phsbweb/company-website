@@ -34,22 +34,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Create Admin User - Temporary</title>
+    <link rel="stylesheet" href="shared/style.css">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: #fafafa;
+        .card-container {
             display: flex;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            margin: 0;
+            height: calc(100vh - 80px);
         }
 
         .card {
             background: white;
             padding: 40px;
             border-radius: 12px;
-            border: 1px solid #e5e5e5;
+            border: 1px solid var(--border-color);
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
             width: 100%;
             max-width: 400px;
@@ -62,54 +62,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
 
         .form-group {
-            margin-bottom: 15px;
+            margin-bottom: 20px;
         }
 
         label {
             display: block;
-            margin-bottom: 5px;
+            margin-bottom: 8px;
             font-size: 0.9rem;
             font-weight: 600;
         }
 
         input {
             width: 100%;
-            padding: 10px;
-            border: 1px solid #e5e5e5;
-            border-radius: 6px;
-            box-sizing: border-box;
-        }
-
-        button {
-            width: 100%;
             padding: 12px;
-            background: #171717;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .success {
-            background: #ecfdf5;
-            color: #065f46;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-            border: 1px solid #d1fae5;
-        }
-
-        .error {
-            background: #fef2f2;
-            color: #991b1b;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-            border: 1px solid #fee2e2;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            background: #fafafa;
         }
 
         .note {
@@ -122,30 +91,40 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body>
-    <div class="card">
-        <h1>Create Admin (Temp)</h1>
+    <?php
+    $activePage = 'create-user';
+    $baseUrl = './';
+    include 'shared/sidebar.php';
+    ?>
 
-        <?php if ($success): ?>
-            <div class="success"><?php echo $success; ?></div>
-        <?php endif; ?>
+    <div class="main-content">
+        <div class="card-container">
+            <div class="card">
+                <h1>Create Admin (Temp)</h1>
 
-        <?php if ($error): ?>
-            <div class="error"><?php echo $error; ?></div>
-        <?php endif; ?>
+                <?php if ($success): ?>
+                    <div class="alert alert-success"><?php echo $success; ?></div>
+                <?php endif; ?>
 
-        <form method="POST">
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" name="username" required placeholder="e.g. admin">
+                <?php if ($error): ?>
+                    <div class="alert alert-error"><?php echo $error; ?></div>
+                <?php endif; ?>
+
+                <form method="POST">
+                    <div class="form-group">
+                        <label>Username</label>
+                        <input type="text" name="username" required placeholder="e.g. admin">
+                    </div>
+                    <div class="form-group">
+                        <label>Password</label>
+                        <input type="password" name="password" required placeholder="Enter password">
+                    </div>
+                    <button type="submit" class="btn-primary" style="width: 100%;">Create User</button>
+                </form>
+
+                <p class="note"><strong>Warning:</strong> Delete this file after use for security.</p>
             </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="password" required placeholder="Enter password">
-            </div>
-            <button type="submit">Create User</button>
-        </form>
-
-        <p class="note"><strong>Warning:</strong> Delete this file after use for security.</p>
+        </div>
     </div>
 </body>
 

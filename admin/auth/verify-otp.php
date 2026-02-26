@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../user/profile_page/includes/db.php';
+include '../../user/profile_page/includes/db.php';
 
 if (!isset($_SESSION['reset_username'])) {
     header('Location: forgot-password.php');

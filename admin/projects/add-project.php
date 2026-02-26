@@ -1,6 +1,6 @@
 <?php
-include 'auth.php';
-include '../user/profile_page/includes/db.php';
+include '../shared/auth.php';
+include '../../user/profile_page/includes/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'] ?? '';
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle Image Upload
     $image_path = null;
     if (isset($_FILES['project_image']) && $_FILES['project_image']['error'] === UPLOAD_ERR_OK) {
-        $upload_dir = '../user/profile_page/assets/images/projects/';
+        $upload_dir = '../../user/profile_page/assets/images/projects/';
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0777, true);
         }
@@ -49,97 +49,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Project - Priority Horizon Admin</title>
+    <link rel="stylesheet" href="../shared/style.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        :root {
-            --sidebar-width: 260px;
-            --accent-color: #171717;
-            --bg-light: #fafafa;
-            --border-color: #e5e5e5;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', sans-serif;
-        }
-
-        body {
-            background-color: var(--bg-light);
-            display: flex;
-        }
-
-        /* Sidebar */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: #ffffff;
-            height: 100vh;
-            border-right: 1px solid var(--border-color);
-            position: fixed;
-            padding: 30px 20px;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .sidebar-logo {
-            font-size: 1.25rem;
-            font-weight: 800;
-            margin-bottom: 40px;
-            padding: 0 10px;
-        }
-
-        .nav-links {
-            list-style: none;
-            flex-grow: 1;
-        }
-
-        .nav-links a {
-            display: flex;
-            align-items: center;
-            padding: 12px 15px;
-            color: #525252;
-            text-decoration: none;
-            border-radius: 8px;
-            transition: all 0.2s;
-            font-size: 0.95rem;
-        }
-
-        .nav-links a i {
-            margin-right: 12px;
-            width: 20px;
-            text-align: center;
-        }
-
-        .nav-links a.active,
-        .nav-links a:hover {
-            background: #f5f5f5;
-            color: var(--accent-color);
-        }
-
-        /* Main Content */
-        .main-content {
-            margin-left: var(--sidebar-width);
-            flex-grow: 1;
-            padding: 40px;
-        }
-
-        .header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 40px;
-        }
-
-        .admin-card {
-            background: #ffffff;
-            padding: 40px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            max-width: 800px;
-        }
-
         .form-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -190,16 +103,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             padding-top: 30px;
         }
 
-        .btn-save {
-            background: var(--accent-color);
-            color: #ffffff;
-            padding: 12px 30px;
-            border-radius: 8px;
-            border: none;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
         .btn-cancel {
             text-decoration: none;
             color: #737373;
@@ -211,15 +114,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body>
 
-    <div class="sidebar">
-        <div class="sidebar-logo">PHSB Admin</div>
-        <ul class="nav-links">
-            <li><a href="dashboard.php"><i class="fas fa-th-large"></i> Dashboard</a></li>
-            <li><a href="projects.php" class="active"><i class="fas fa-project-diagram"></i> Projects</a></li>
-            <li><a href="featured.php"><i class="fas fa-star"></i> Featured</a></li>
-            <li><a href="attendance.php"><i class="fas fa-user-check"></i> Attendance</a></li>
-        </ul>
-    </div>
+    <?php
+    $activePage = 'projects';
+    $baseUrl = '../';
+    include '../shared/sidebar.php';
+    ?>
 
     <div class="main-content">
         <div class="header">
