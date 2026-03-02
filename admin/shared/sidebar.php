@@ -13,18 +13,18 @@ $baseUrl = $baseUrl ?? '../';
             </a>
         </li>
         <li>
-            <a href="<?php echo $baseUrl; ?>projects/projects.php" class="<?php echo ($activePage == 'projects') ? 'active' : ''; ?>">
-                <i class="fas fa-project-diagram"></i> Projects
-            </a>
-        </li>
-        <li>
-            <a href="<?php echo $baseUrl; ?>projects/featured.php" class="<?php echo ($activePage == 'featured') ? 'active' : ''; ?>">
-                <i class="fas fa-star"></i> Featured
-            </a>
-        </li>
-        <li>
             <a href="<?php echo $baseUrl; ?>attendance/attendance.php" class="<?php echo ($activePage == 'attendance') ? 'active' : ''; ?>">
                 <i class="fas fa-user-check"></i> Attendance
+            </a>
+        </li>
+        <li>
+            <a href="<?php echo $baseUrl; ?>employees/employees.php" class="<?php echo ($activePage == 'employees') ? 'active' : ''; ?>">
+                <i class="fas fa-users"></i> Employees
+            </a>
+        </li>
+        <li>
+            <a href="<?php echo $baseUrl; ?>projects/projects.php" class="<?php echo ($activePage == 'projects') ? 'active' : ''; ?>">
+                <i class="fas fa-project-diagram"></i> Projects
             </a>
         </li>
         <li>

@@ -5,17 +5,10 @@ include '../../user/profile_page/includes/db.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'] ?? '';
     $client = $_POST['client'] ?? '';
-    $contract_sum = !empty($_POST['contract_sum']) ? $_POST['contract_sum'] : null;
     $completion_month = !empty($_POST['completion_month']) ? (int)$_POST['completion_month'] : null;
     $completion_year = !empty($_POST['completion_year']) ? (int)$_POST['completion_year'] : null;
     $status = isset($_POST['status']) && $_POST['status'] !== '' ? (int)$_POST['status'] : null;
 
-    $eot_number = !empty($_POST['eot_number']) ? (int)$_POST['eot_number'] : null;
-    $eot_month = !empty($_POST['eot_month']) ? (int)$_POST['eot_month'] : null;
-    $eot_year = !empty($_POST['eot_year']) ? (int)$_POST['eot_year'] : null;
-    $eot = ($eot_number !== null || $eot_month !== null || $eot_year !== null) ? 1 : 0;
-
-    $vo = isset($_POST['vo']) ? 1 : 0;
 
     // Handle Image Upload
     $image_path = null;
@@ -33,8 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    $stmt = $pdo->prepare("INSERT INTO projects (title, client, contract_sum, completion_year, completion_month, status, eot, eot_number, eot_month, eot_year, vo, image_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-    if ($stmt->execute([$title, $client, $contract_sum, $completion_year, $completion_month, $status, $eot, $eot_number, $eot_month, $eot_year, $vo, $image_path])) {
+    $stmt = $pdo->prepare("INSERT INTO projects (title, client, completion_year, completion_month, status, image_path) VALUES (?, ?, ?, ?, ?, ?)");
+    if ($stmt->execute([$title, $client, $completion_year, $completion_month, $status, $image_path])) {
         header('Location: projects.php?msg=added');
         exit;
     } else {
@@ -154,11 +147,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <div class="form-group">
-                        <label>Contract Sum (RM)</label>
-                        <input type="number" step="0.01" name="contract_sum" placeholder="e.g., 25000000.00">
-                    </div>
-
-                    <div class="form-group">
                         <label>Completion Month</label>
                         <select name="completion_month">
                             <option value="">Select Month</option>
@@ -191,44 +179,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         </select>
                     </div>
 
-                    <div class="form-group">
-                        <div class="checkbox-group">
-                            <input type="checkbox" name="vo" id="vo">
-                            <label for="vo" style="margin-bottom: 0;">Variation Order (VO)?</label>
-                        </div>
-                    </div>
-
-                    <div class="form-group full-width">
-                        <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 10px 0;">
-                        <h3 style="font-size: 1rem; margin: 20px 0 10px;">Extension of Time (EOT) - Optional</h3>
-                    </div>
-
-                    <div class="form-group">
-                        <label>EOT Number</label>
-                        <input type="number" name="eot_number" placeholder="e.g., 1">
-                    </div>
-
-                    <div class="form-group">
-                        <label>EOT Month</label>
-                        <select name="eot_month">
-                            <option value="">Select Month</option>
-                            <?php
-                            foreach ($months as $num => $month) echo "<option value='$num'>$month</option>";
-                            ?>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>EOT Year</label>
-                        <select name="eot_year">
-                            <option value="">Select Year</option>
-                            <?php
-                            for ($y = 2012; $y <= $currentYear + 20; $y++) {
-                                echo "<option value='$y'>$y</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
 
                 </div>
 

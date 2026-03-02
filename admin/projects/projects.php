@@ -139,7 +139,10 @@ try {
                 <h1 style="font-size: 1.75rem;">Manage Projects</h1>
                 <p style="color: #737373;">View and update your company portfolio</p>
             </div>
-            <a href="add-project.php" class="btn-add"><i class="fas fa-plus"></i> Add New Project</a>
+            <div style="display: flex; gap: 10px;">
+                <a href="featured.php" class="btn-add" style="background: #737373;"><i class="fas fa-star"></i> Manage Featured</a>
+                <a href="add-project.php" class="btn-add"><i class="fas fa-plus"></i> Add New Project</a>
+            </div>
         </div>
 
         <?php if ($error): ?>
@@ -155,12 +158,8 @@ try {
                         <th>#</th>
                         <th>Project Title</th>
                         <th>Client</th>
-                        <th>Contract Sum (RM)</th>
                         <th>Completion</th>
                         <th>Status</th>
-                        <th>EOT Date</th>
-                        <th>EOT No.</th>
-                        <th>VO</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -171,38 +170,12 @@ try {
                                 <td><?php echo htmlspecialchars($project['id']); ?></td>
                                 <td style="font-weight: 600;"><?php echo htmlspecialchars($project['title']); ?></td>
                                 <td><?php echo htmlspecialchars($project['client']); ?></td>
-                                <td><?php echo number_format($project['contract_sum'], 2); ?></td>
                                 <td><?php echo htmlspecialchars(($months[$project['completion_month']] ?? '') . ' ' . $project['completion_year']); ?></td>
                                 <td>
                                     <?php if ($project['status'] == 1): ?>
                                         <span class="status-badge status-completed">Completed</span>
                                     <?php else: ?>
                                         <span class="status-badge status-ongoing">Ongoing</span>
-                                    <?php endif; ?>
-                                </td>
-                                <td>
-                                    <?php
-                                    if ($project['eot_month'] && $project['eot_year']) {
-                                        echo htmlspecialchars($months[$project['eot_month']] . ' ' . $project['eot_year']);
-                                    } else {
-                                        echo "-";
-                                    }
-                                    ?>
-                                </td>
-                                <td>
-                                    <?php
-                                    if ($project['eot_number'] === 0 || $project['eot_number'] === '0') {
-                                        echo "-";
-                                    } else {
-                                        echo htmlspecialchars($project['eot_number'] ?? "-");
-                                    }
-                                    ?>
-                                </td>
-                                <td style="text-align: center;">
-                                    <?php if ($project['vo'] == 1): ?>
-                                        <span class="vo-tick"><i class="fas fa-check"></i></span>
-                                    <?php else: ?>
-                                        <span>-</span>
                                     <?php endif; ?>
                                 </td>
                                 <td>
@@ -215,7 +188,7 @@ try {
                         <?php endforeach; ?>
                     <?php else: ?>
                         <tr>
-                            <td colspan="10" style="text-align: center; padding: 40px; color: #737373;">No projects found. <a href="add-project.php">Add your first project</a></td>
+                            <td colspan="9" style="text-align: center; padding: 40px; color: #737373;">No projects found. <a href="add-project.php">Add your first project</a></td>
                         </tr>
                     <?php endif; ?>
                 </tbody>

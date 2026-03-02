@@ -77,9 +77,9 @@
 
                     <!-- Contact & Finance -->
                     <div>
-                        <h3 class="corp-info-title">Registered Address</h3>
+                        <h3 class="corp-info-title">Business Address</h3>
                         <p class="corp-address">
-                            No. 17, Jalan IMP 1/1, Pusat Teknologi Sinar Meranti,<br>
+                            No. 12, Jalan IMP 1/1, Pusat Teknologi Sinar Meranti,<br>
                             Taman Industri Meranti Perdana,<br>
                             47120 Puchong, Selangor Darul Ehsan.
                         </p>

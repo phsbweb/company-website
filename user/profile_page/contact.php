@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <i class="fas fa-map-marker-alt contact-icon"></i>
                             <div>
                                 <h4 class="contact-label">Visit Us</h4>
-                                <p class="card-desc">No. 17, Jalan IMP 1/1, <br>Pusat Teknologi Sinar Meranti,<br>Taman Industri Meranti Perdana,<br>47120 Puchong, Selangor Darul Ehsan.</p>
+                                <p class="card-desc">No. 12, Jalan IMP 1/1, <br>Pusat Teknologi Sinar Meranti,<br>Taman Industri Meranti Perdana,<br>47120 Puchong, Selangor Darul Ehsan.</p>
                             </div>
                         </div>
 
