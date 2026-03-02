@@ -4,10 +4,13 @@ include '../shared/auth.php';
 require_once '../../user/attendance/db_connect.php';
 
 // Handle Actions (Manual Checkout, Edit Time)
-$message = "";
-$error = "";
+$message = $_SESSION['success_msg'] ?? "";
+$error = $_SESSION['error_msg'] ?? "";
+unset($_SESSION['success_msg'], $_SESSION['error_msg']);
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $redirect_url = "attendance.php" . ($_SERVER['QUERY_STRING'] ? '?' . $_SERVER['QUERY_STRING'] : '');
+
     if (isset($_POST['action'])) {
         try {
             if ($_POST['action'] === 'manual_checkout') {
@@ -15,16 +18,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $now = date('Y-m-d H:i:s');
                 $stmt = $pdo->prepare("UPDATE attendance SET check_out = ?, status = 'checked_out' WHERE id = ?");
                 $stmt->execute([$now, $id]);
-                $message = "Employee checked out successfully.";
+                $_SESSION['success_msg'] = "Employee checked out successfully.";
             } elseif ($_POST['action'] === 'edit_checkout_time') {
                 $id = $_POST['attendance_id'];
+                $new_date = $_POST['new_checkout_date'];
                 $new_time = $_POST['new_checkout_time'];
+                $combined_datetime = $new_date . ' ' . $new_time . ':00';
                 $stmt = $pdo->prepare("UPDATE attendance SET check_out = ?, status = 'checked_out' WHERE id = ?");
-                $stmt->execute([$new_time, $id]);
-                $message = "Checkout time updated successfully.";
+                $stmt->execute([$combined_datetime, $id]);
+                $_SESSION['success_msg'] = "Checkout time updated successfully.";
             }
+
+            header("Location: $redirect_url");
+            exit;
         } catch (Exception $e) {
-            $error = "Action failed: " . $e->getMessage();
+            $_SESSION['error_msg'] = "Action failed: " . $e->getMessage();
+            header("Location: $redirect_url");
+            exit;
         }
     }
 }
@@ -32,39 +42,69 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Handle Filters
 $selected_date = isset($_GET['date']) ? $_GET['date'] : (isset($_GET['month']) ? '' : date('Y-m-d'));
 $selected_employee = isset($_GET['employee_id']) ? $_GET['employee_id'] : '';
-$selected_month = isset($_GET['month']) ? $_GET['month'] : date('Y-m');
+$selected_month = isset($_GET['month']) ? $_GET['month'] : (isset($_GET['date']) ? '' : date('Y-m'));
 
 // Fetch Employees for Filter
 $employees = $pdo->query("SELECT id, full_name FROM employees ORDER BY full_name ASC")->fetchAll();
 
+// Pagination Settings
+$limit = 10;
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+if ($page < 1) $page = 1;
+$offset = ($page - 1) * $limit;
+
 // Fetch attendance records based on filters
 try {
-    $query = "SELECT a.*, e.full_name, e.username 
-              FROM attendance a 
-              JOIN employees e ON a.employee_id = e.id 
-              WHERE 1=1";
+    // First, count total records for pagination
+    $count_query = "SELECT COUNT(*) FROM attendance a JOIN employees e ON a.employee_id = e.id WHERE 1=1";
     $params = [];
 
     if ($selected_date) {
-        $query .= " AND DATE(a.created_at) = ?";
+        $count_query .= " AND DATE(a.created_at) = ?";
         $params[] = $selected_date;
     } elseif ($selected_month) {
-        $query .= " AND DATE_FORMAT(a.created_at, '%Y-%m') = ?";
+        $count_query .= " AND DATE_FORMAT(a.created_at, '%Y-%m') = ?";
         $params[] = $selected_month;
     }
 
     if ($selected_employee) {
-        $query .= " AND a.employee_id = ?";
+        $count_query .= " AND a.employee_id = ?";
         $params[] = $selected_employee;
     }
 
-    $query .= " ORDER BY a.created_at DESC";
+    $stmt_count = $pdo->prepare($count_query);
+    $stmt_count->execute($params);
+    $total_records = $stmt_count->fetchColumn();
+    $total_pages = ceil($total_records / $limit);
+
+    // Now fetch the records for the current page
+    $query = "SELECT a.*, e.full_name, e.username, e.working_shift 
+              FROM attendance a 
+              JOIN employees e ON a.employee_id = e.id 
+              WHERE 1=1";
+
+    // Reuse filter conditions
+    if ($selected_date) {
+        $query .= " AND DATE(a.created_at) = ?";
+    } elseif ($selected_month) {
+        $query .= " AND DATE_FORMAT(a.created_at, '%Y-%m') = ?";
+    }
+
+    if ($selected_employee) {
+        $query .= " AND a.employee_id = ?";
+    }
+
+    $query .= " ORDER BY a.created_at DESC LIMIT ? OFFSET ?";
+
+    $records_params = array_merge($params, [$limit, $offset]);
 
     $stmt = $pdo->prepare($query);
-    $stmt->execute($params);
+    $stmt->execute($records_params);
     $records = $stmt->fetchAll();
 } catch (Exception $e) {
     $records = [];
+    $total_records = 0;
+    $total_pages = 0;
     $error = "Failed to fetch attendance records: " . $e->getMessage();
 }
 
@@ -73,11 +113,15 @@ $monthly_hours = null;
 if ($selected_employee && $selected_month) {
     try {
         $stmt = $pdo->prepare("
-            SELECT SUM(TIMESTAMPDIFF(SECOND, check_in, check_out)) as total_seconds
-            FROM attendance 
-            WHERE employee_id = ? 
-            AND DATE_FORMAT(created_at, '%Y-%m') = ?
-            AND check_out IS NOT NULL
+            SELECT SUM(GREATEST(0, TIMESTAMPDIFF(SECOND, 
+                GREATEST(check_in, TIMESTAMP(DATE(check_in), CASE WHEN e.working_shift = '830-530' THEN '08:30:00' ELSE '08:00:00' END)),
+                LEAST(check_out, TIMESTAMP(DATE(check_out), CASE WHEN e.working_shift = '830-530' THEN '17:30:00' ELSE '17:00:00' END))
+            ))) as total_seconds
+            FROM attendance a
+            JOIN employees e ON a.employee_id = e.id
+            WHERE a.employee_id = ? 
+            AND DATE_FORMAT(a.created_at, '%Y-%m') = ?
+            AND a.check_out IS NOT NULL
         ");
         $stmt->execute([$selected_employee, $selected_month]);
         $result = $stmt->fetch();
@@ -144,16 +188,16 @@ if ($selected_employee && $selected_month) {
         /* Summary Info */
         .summary-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
         }
 
         .summary-card {
             background: var(--accent-color);
             color: white;
-            padding: 25px;
-            border-radius: 12px;
+            padding: 15px 20px;
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: space-between;
@@ -166,15 +210,15 @@ if ($selected_employee && $selected_month) {
         }
 
         .summary-info h4 {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             opacity: 0.7;
             text-transform: uppercase;
-            margin-bottom: 5px;
+            margin-bottom: 3px;
             letter-spacing: 0.05em;
         }
 
         .summary-info p {
-            font-size: 1.75rem;
+            font-size: 1.4rem;
             font-weight: 800;
         }
 
@@ -261,6 +305,67 @@ if ($selected_employee && $selected_month) {
             color: #737373;
             margin-bottom: 25px;
         }
+
+        /* Pagination Styles */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 30px;
+            margin-bottom: 20px;
+        }
+
+        .pagination-link {
+            padding: 8px 16px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            text-decoration: none;
+            color: #525252;
+            font-size: 0.9rem;
+            font-weight: 600;
+            background: #fff;
+            transition: all 0.2s;
+        }
+
+        .pagination-link:hover {
+            background: #f5f5f5;
+            border-color: #d4d4d4;
+        }
+
+        .pagination-link.active {
+            background: var(--accent-color);
+            color: white;
+            border-color: var(--accent-color);
+        }
+
+        .pagination-link.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
+
+        /* Location Styling */
+        .location-link {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            max-width: 180px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: #525252;
+            text-decoration: none;
+            transition: color 0.2s;
+            line-height: 1.3;
+            white-space: normal;
+            vertical-align: middle;
+        }
+
+        .location-link:hover {
+            color: var(--accent-color);
+            text-decoration: underline;
+        }
     </style>
 </head>
 
@@ -317,27 +422,36 @@ if ($selected_employee && $selected_month) {
         </div>
 
         <?php
-        $display_info = $selected_date ? date('M d, Y', strtotime($selected_date)) : date('F Y', strtotime($selected_month . '-01'));
+        if ($selected_date) {
+            $display_info = date('M d, Y', strtotime($selected_date));
+            $is_month_view = false;
+        } elseif ($selected_month) {
+            $display_info = date('F Y', strtotime($selected_month . '-01'));
+            $is_month_view = true;
+        } else {
+            $display_info = "All History";
+            $is_month_view = false;
+        }
         ?>
         <div style="margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between;">
             <p style="font-size: 0.95rem; color: #525252;">
                 Displaying: <strong style="color: var(--accent-color);"><?php echo $display_info; ?></strong>
-                <?php if (!$selected_date): ?> <span style="font-size: 0.8rem; color: #737373;">(Month View)</span><?php endif; ?>
+                <?php if ($is_month_view): ?> <span style="font-size: 0.8rem; color: #737373;">(Month View)</span><?php endif; ?>
             </p>
-            <?php if ($selected_date || $selected_employee): ?>
-                <a href="attendance.php?date=" style="font-size: 0.85rem; color: #737373; text-decoration: none;"><i class="fas fa-times"></i> Clear Filters</a>
+            <?php if ($selected_date || $selected_month || $selected_employee): ?>
+                <a href="attendance.php?date=&month=&employee_id=" style="font-size: 0.85rem; color: #737373; text-decoration: none;"><i class="fas fa-times"></i> Clear Filters</a>
             <?php endif; ?>
         </div>
 
         <?php if ($monthly_hours !== null || $selected_employee): ?>
             <div class="summary-grid">
                 <?php if ($monthly_hours !== null): ?>
-                    <div class="summary-card">
+                    <div class="summary-card light">
                         <div class="summary-info">
                             <h4>Monthly Total</h4>
                             <p><?php echo $monthly_hours; ?></p>
                         </div>
-                        <div style="font-size: 2.5rem; opacity: 0.2;"><i class="fas fa-history"></i></div>
+                        <div style="font-size: 2.5rem; opacity: 0.1;"><i class="fas fa-history"></i></div>
                     </div>
                 <?php endif; ?>
 
@@ -362,8 +476,10 @@ if ($selected_employee && $selected_month) {
                     <thead>
                         <tr>
                             <th>Employee</th>
-                            <th>Time In</th>
-                            <th>Time Out</th>
+                            <th>Check In</th>
+                            <th>Check Out</th>
+                            <th>In Location</th>
+                            <th>Out Location</th>
                             <th>Status</th>
                             <th style="text-align: right;">Action</th>
                         </tr>
@@ -387,6 +503,30 @@ if ($selected_employee && $selected_month) {
                                         <span style="color: var(--warning-color); font-weight: 600; font-size: 0.85rem;">Active Session</span>
                                     <?php endif; ?>
                                 </td>
+                                <td style="font-size: 0.85rem;">
+                                    <?php if (!empty($row['location_in'])): ?>
+                                        <a href="https://www.google.com/maps/search/?api=1&query=<?php echo urlencode($row['location_in']); ?>"
+                                            target="_blank"
+                                            class="location-link"
+                                            title="<?php echo htmlspecialchars($row['location_in']); ?>">
+                                            <i class="fas fa-location-dot" style="font-size: 0.7rem; opacity: 0.5; margin-right: 4px;"></i><?php echo htmlspecialchars($row['location_in']); ?>
+                                        </a>
+                                    <?php else: ?>
+                                        <span style="color: #a3a3a3;">-</span>
+                                    <?php endif; ?>
+                                </td>
+                                <td style="font-size: 0.85rem;">
+                                    <?php if (!empty($row['location_out'])): ?>
+                                        <a href="https://www.google.com/maps/search/?api=1&query=<?php echo urlencode($row['location_out']); ?>"
+                                            target="_blank"
+                                            class="location-link"
+                                            title="<?php echo htmlspecialchars($row['location_out']); ?>">
+                                            <i class="fas fa-location-dot" style="font-size: 0.7rem; opacity: 0.5; margin-right: 4px;"></i><?php echo htmlspecialchars($row['location_out']); ?>
+                                        </a>
+                                    <?php else: ?>
+                                        <span style="color: #a3a3a3;">-</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td>
                                     <span class="status-badge status-<?php echo $row['status']; ?>">
                                         <?php echo str_replace('_', ' ', strtoupper($row['status'])); ?>
@@ -394,11 +534,11 @@ if ($selected_employee && $selected_month) {
                                 </td>
                                 <td style="text-align: right;">
                                     <?php if ($row['status'] === 'checked_in'): ?>
-                                        <form action="attendance.php" method="POST" style="display:inline;" onsubmit="return confirm('Force checkout this employee?');">
+                                        <form action="attendance.php?<?php echo htmlspecialchars($_SERVER['QUERY_STRING']); ?>" method="POST" style="display:inline;" onsubmit="return confirm('Force checkout this employee?');">
                                             <input type="hidden" name="action" value="manual_checkout">
                                             <input type="hidden" name="attendance_id" value="<?php echo $row['id']; ?>">
                                             <button type="submit" class="action-btn checkout">
-                                                <i class="fas fa-sign-out-alt"></i> Force Checkout
+                                                Force Checkout
                                             </button>
                                         </form>
                                     <?php else: ?>
@@ -411,6 +551,43 @@ if ($selected_employee && $selected_month) {
                         <?php endforeach; ?>
                     </tbody>
                 </table>
+
+                <?php if ($total_pages > 1): ?>
+                    <div class="pagination">
+                        <?php
+                        // Preserve filter parameters in pagination links
+                        $filter_params = $_GET;
+                        unset($filter_params['page']);
+                        $query_string = http_build_query($filter_params);
+                        $base_link = "attendance.php?" . ($query_string ? $query_string . "&" : "");
+                        ?>
+
+                        <a href="<?php echo $base_link; ?>page=<?php echo max(1, $page - 1); ?>"
+                            class="pagination-link <?php echo ($page <= 1) ? 'disabled' : ''; ?>">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+
+                        <?php
+                        // Show up to 5 page numbers
+                        $start_page = max(1, $page - 2);
+                        $end_page = min($total_pages, $start_page + 4);
+                        if ($end_page - $start_page < 4) {
+                            $start_page = max(1, $end_page - 4);
+                        }
+
+                        for ($i = $start_page; $i <= $end_page; $i++): ?>
+                            <a href="<?php echo $base_link; ?>page=<?php echo $i; ?>"
+                                class="pagination-link <?php echo ($i === $page) ? 'active' : ''; ?>">
+                                <?php echo $i; ?>
+                            </a>
+                        <?php endfor; ?>
+
+                        <a href="<?php echo $base_link; ?>page=<?php echo min($total_pages, $page + 1); ?>"
+                            class="pagination-link <?php echo ($page >= $total_pages) ? 'disabled' : ''; ?>">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </div>
+                <?php endif; ?>
             <?php endif; ?>
         </div>
     </div>
@@ -420,12 +597,17 @@ if ($selected_employee && $selected_month) {
         <div class="modal-content">
             <div class="modal-header">Update Record</div>
             <div class="modal-subheader">Adjust the checkout timestamp for this session.</div>
-            <form action="attendance.php" method="POST">
+            <form action="attendance.php?<?php echo htmlspecialchars($_SERVER['QUERY_STRING']); ?>" method="POST">
                 <input type="hidden" name="action" value="edit_checkout_time">
                 <input type="hidden" name="attendance_id" id="modal_id">
+                <input type="hidden" name="new_checkout_date" id="modal_date_hidden">
+                <div class="filter-group" style="margin-bottom: 25px;">
+                    <label>Record Date</label>
+                    <input type="text" id="modal_date_display" readonly style="background: #f9f9f9; border-color: #ddd; color: #666;">
+                </div>
                 <div class="filter-group" style="margin-bottom: 25px;">
                     <label>Correct Checkout Time</label>
-                    <input type="datetime-local" name="new_checkout_time" id="modal_time" required>
+                    <input type="time" name="new_checkout_time" id="modal_time" required>
                 </div>
                 <div style="display: flex; gap: 12px; justify-content: flex-end;">
                     <button type="button" class="btn-primary" style="background: #f5f5f5; color: #525252;" onclick="closeModal()">Cancel</button>
@@ -436,9 +618,13 @@ if ($selected_employee && $selected_month) {
     </div>
 
     <script>
-        function openEditModal(id, time) {
+        function openEditModal(id, datetime) {
+            // datetime is in 'YYYY-MM-DDTHH:MM' format
+            const parts = datetime.split('T');
             document.getElementById('modal_id').value = id;
-            document.getElementById('modal_time').value = time;
+            document.getElementById('modal_date_hidden').value = parts[0];
+            document.getElementById('modal_date_display').value = parts[0];
+            document.getElementById('modal_time').value = parts[1];
             document.getElementById('editModal').style.display = 'flex';
         }
 

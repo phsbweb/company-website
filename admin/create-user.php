@@ -1,5 +1,5 @@
 <?php
-include '../user/profile_page/includes/db.php';
+include '../user/attendance/db_connect.php';
 
 $success = false;
 $error = false;

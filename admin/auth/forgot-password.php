@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../../user/profile_page/includes/db.php';
+include '../../user/attendance/db_connect.php';
 require '../../user/profile_page/includes/mail_config.php';
 require '../../user/profile_page/includes/PHPMailer/Exception.php';
 require '../../user/profile_page/includes/PHPMailer/PHPMailer.php';
