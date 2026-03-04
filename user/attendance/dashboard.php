@@ -9,11 +9,30 @@ require_once 'db_connect.php';
 
 // Get current attendance status
 $employee_id = $_SESSION['user_id'];
-$stmt = $pdo->prepare("SELECT * FROM attendance WHERE employee_id = ? ORDER BY created_at DESC LIMIT 1");
+$stmt = $pdo->prepare("SELECT a.*, e.working_shift FROM attendance a JOIN employees e ON a.employee_id = e.id WHERE a.employee_id = ? ORDER BY a.created_at DESC LIMIT 1");
 $stmt->execute([$employee_id]);
 $current_status = $stmt->fetch();
 
-$isCheckedIn = ($current_status && $current_status['status'] === 'checked_in');
+if ($current_status && $current_status['status'] === 'checked_in') {
+    $checkin_date = date('Y-m-d', strtotime($current_status['check_in']));
+    $today = date('Y-m-d');
+
+    if ($checkin_date < $today) {
+        // Auto-fix stale check-in from previous day
+        $shift_end_time = ($current_status['working_shift'] === '830-530') ? "17:30:00" : "17:00:00";
+        $auto_checkout = $checkin_date . ' ' . $shift_end_time;
+
+        $update = $pdo->prepare("UPDATE attendance SET check_out = ?, status = 'checked_out', location_out = 'Auto-Checkout (System)' WHERE id = ?");
+        $update->execute([$auto_checkout, $current_status['id']]);
+
+        // Refresh status after fix
+        $isCheckedIn = false;
+    } else {
+        $isCheckedIn = true;
+    }
+} else {
+    $isCheckedIn = false;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -44,6 +63,11 @@ $isCheckedIn = ($current_status && $current_status['status'] === 'checked_in');
                 </button>
             </form>
         </header>
+
+        <div class="nav-tabs" style="display: flex; gap: 10px; margin-bottom: 2rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">
+            <a href="dashboard.php" class="nav-tab active" style="padding: 0.5rem 1rem; text-decoration: none; color: var(--primary-color); font-weight: 500; border-radius: 6px; background: #f1f5f9;">Attendance</a>
+            <a href="leaves.php" class="nav-tab" style="padding: 0.5rem 1rem; text-decoration: none; color: #64748b; font-weight: 500; border-radius: 6px; transition: all 0.2s;">Leave Requests</a>
+        </div>
 
         <div class="status-badge <?php echo $isCheckedIn ? 'status-checked-in' : 'status-checked-out'; ?>" id="status-badge">
             Status: <?php echo $isCheckedIn ? 'Checked In' : 'Checked Out'; ?>

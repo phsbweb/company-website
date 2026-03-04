@@ -12,15 +12,28 @@ $baseUrl = $baseUrl ?? '../';
                 <i class="fas fa-th-large"></i> Dashboard
             </a>
         </li>
-        <li>
-            <a href="<?php echo $baseUrl; ?>attendance/attendance.php" class="<?php echo ($activePage == 'attendance') ? 'active' : ''; ?>">
-                <i class="fas fa-user-check"></i> Attendance
-            </a>
-        </li>
-        <li>
-            <a href="<?php echo $baseUrl; ?>employees/employees.php" class="<?php echo ($activePage == 'employees') ? 'active' : ''; ?>">
+        <li class="has-dropdown <?php echo ($activePage == 'employees' || $activePage == 'attendance' || $activePage == 'leaves') ? 'active open' : ''; ?>">
+            <a href="javascript:void(0)" class="dropdown-toggle">
                 <i class="fas fa-users"></i> Employees
+                <i class="fas fa-chevron-right chevron"></i>
             </a>
+            <ul class="sub-menu">
+                <li>
+                    <a href="<?php echo $baseUrl; ?>employees/employees.php" class="<?php echo ($activePage == 'employees') ? 'active' : ''; ?>">
+                        List
+                    </a>
+                </li>
+                <li>
+                    <a href="<?php echo $baseUrl; ?>employees/attendance.php" class="<?php echo ($activePage == 'attendance') ? 'active' : ''; ?>">
+                        Attendance
+                    </a>
+                </li>
+                <li>
+                    <a href="<?php echo $baseUrl; ?>employees/leaves.php" class="<?php echo ($activePage == 'leaves') ? 'active' : ''; ?>">
+                        Leaves
+                    </a>
+                </li>
+            </ul>
         </li>
         <li>
             <a href="<?php echo $baseUrl; ?>projects/projects.php" class="<?php echo ($activePage == 'projects') ? 'active' : ''; ?>">
@@ -39,3 +52,31 @@ $baseUrl = $baseUrl ?? '../';
         </a>
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const dropdowns = document.querySelectorAll('.has-dropdown');
+
+        dropdowns.forEach(dropdown => {
+            const toggle = dropdown.querySelector('.dropdown-toggle');
+
+            toggle.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+
+                const isOpen = dropdown.classList.contains('open');
+
+                // Close others
+                dropdowns.forEach(d => {
+                    if (d !== dropdown) d.classList.remove('open');
+                });
+
+                if (isOpen) {
+                    dropdown.classList.remove('open');
+                } else {
+                    dropdown.classList.add('open');
+                }
+            });
+        });
+    });
+</script>

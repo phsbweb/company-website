@@ -17,13 +17,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     try {
         if ($action === 'checkin') {
             // Check if already checked in
-            $stmt = $pdo->prepare("SELECT status FROM attendance WHERE employee_id = ? ORDER BY created_at DESC LIMIT 1");
+            $stmt = $pdo->prepare("SELECT a.*, e.working_shift FROM attendance a JOIN employees e ON a.employee_id = e.id WHERE a.employee_id = ? ORDER BY a.created_at DESC LIMIT 1");
             $stmt->execute([$employee_id]);
             $last_record = $stmt->fetch();
 
             if ($last_record && $last_record['status'] === 'checked_in') {
-                echo json_encode(['success' => false, 'message' => 'Already checked in']);
-                exit;
+                $checkin_date = date('Y-m-d', strtotime($last_record['check_in']));
+                $today = date('Y-m-d');
+
+                if ($checkin_date < $today) {
+                    // Auto-fix stale check-in before new check-in
+                    $shift_end_time = ($last_record['working_shift'] === '830-530') ? "17:30:00" : "17:00:00";
+                    $auto_checkout = $checkin_date . ' ' . $shift_end_time;
+
+                    $update = $pdo->prepare("UPDATE attendance SET check_out = ?, status = 'checked_out', location_out = 'Auto-Checkout (System)' WHERE id = ?");
+                    $update->execute([$auto_checkout, $last_record['id']]);
+                } else {
+                    echo json_encode(['success' => false, 'message' => 'Already checked in']);
+                    exit;
+                }
             }
 
             $location = $_POST['location'] ?? 'Unknown';

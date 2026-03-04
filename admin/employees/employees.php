@@ -108,7 +108,7 @@ unset($_SESSION['success_msg'], $_SESSION['error_msg']);
                             <th>Username</th>
                             <th>Default Shift</th>
                             <th>Date Joined</th>
-                            <th style="text-align: right;">Actions</th>
+                            <th style="text-align: center;">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -127,17 +127,24 @@ unset($_SESSION['success_msg'], $_SESSION['error_msg']);
                                 <td style="color: #737373; font-size: 0.9rem;">
                                     <?php echo date('d M Y', strtotime($emp['created_at'])); ?>
                                 </td>
-                                <td style="text-align: right;">
-                                    <a href="edit-employee.php?id=<?php echo $emp['id']; ?>" class="action-btn edit" style="margin-right: 5px;">
-                                        <i class="fas fa-edit"></i> Edit
-                                    </a>
-                                    <form action="delete-employee.php" method="POST" style="display:inline;"
-                                        onsubmit="return confirm('Are you sure you want to delete this employee? This will also remove their attendance history.');">
-                                        <input type="hidden" name="id" value="<?php echo $emp['id']; ?>">
-                                        <button type="submit" class="action-btn checkout" style="background: #fee2e2; color: #dc2626; border-color: #fecaca;">
-                                            <i class="fas fa-trash-alt"></i> Delete
+                                <td style="text-align: center;">
+                                    <div class="actions-dropdown">
+                                        <button class="action-dot-btn" onclick="toggleDropdown(this, event)">
+                                            <i class="fas fa-bars"></i>
                                         </button>
-                                    </form>
+                                        <div class="dropdown-menu">
+                                            <a href="edit-employee.php?id=<?php echo $emp['id']; ?>" class="dropdown-item">
+                                                <i class="fas fa-edit" style="color: #2563eb;"></i> Edit
+                                            </a>
+                                            <form action="delete-employee.php" method="POST" style="display:contents;"
+                                                onsubmit="return confirm('Are you sure you want to delete this employee? This will also remove their attendance history.');">
+                                                <input type="hidden" name="id" value="<?php echo $emp['id']; ?>">
+                                                <button type="submit" class="dropdown-item delete">
+                                                    <i class="fas fa-trash-alt"></i> Delete
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -229,7 +236,118 @@ unset($_SESSION['success_msg'], $_SESSION['error_msg']);
             color: white;
             border-color: var(--accent-color);
         }
+
+        /* Dropdown Actions Menu - Moved here for reliability */
+        .actions-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+
+        .action-dot-btn {
+            background: #f5f5f5;
+            border: 1px solid var(--border-color);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            color: #525252;
+            transition: all 0.2s;
+        }
+
+        .action-dot-btn:hover {
+            background: #eeeeee;
+            color: var(--accent-color);
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 8px;
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            min-width: 140px;
+            display: none;
+            overflow: hidden;
+        }
+
+        .dropdown-menu.show {
+            display: block;
+            animation: fadeInScale 0.15s ease-out;
+        }
+
+        @keyframes fadeInScale {
+            from {
+                opacity: 0;
+                transform: scale(0.95);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 15px;
+            color: #525252;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: background 0.2s;
+            border: none;
+            width: 100%;
+            text-align: left;
+            background: none;
+            cursor: pointer;
+        }
+
+        .dropdown-item:hover {
+            background: #f8fafc;
+            color: var(--accent-color);
+        }
+
+        .dropdown-item i {
+            width: 16px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        .dropdown-item.delete {
+            color: var(--danger-color);
+        }
+
+        .dropdown-item.delete:hover {
+            background: #fef2f2;
+        }
     </style>
+    <script>
+        function toggleDropdown(btn, event) {
+            event.stopPropagation();
+            const menu = btn.nextElementSibling;
+
+            // Close other menus
+            document.querySelectorAll('.dropdown-menu').forEach(i => {
+                if (i !== menu) i.classList.remove('show');
+            });
+
+            menu.classList.toggle('show');
+        }
+
+        // Close on outside click
+        window.addEventListener('click', function() {
+            document.querySelectorAll('.dropdown-menu').forEach(i => i.classList.remove('show'));
+        });
+    </script>
 </body>
 
 </html>

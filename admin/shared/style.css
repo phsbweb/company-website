@@ -75,6 +75,86 @@ body {
     color: var(--accent-color);
 }
 
+/* Dropdown Sub-menu Styling */
+.has-dropdown {
+    position: relative;
+    list-style: none;
+    z-index: 101; /* Higher than main-content */
+}
+
+.has-dropdown .dropdown-toggle {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    width: 100%;
+    position: relative;
+    z-index: 102;
+}
+
+/* Parent highlight when sub-item is active */
+.has-dropdown.active > .dropdown-toggle {
+    background: #f5f5f5;
+    color: var(--accent-color);
+}
+
+.has-dropdown .chevron {
+    margin-left: auto;
+    font-size: 0.65rem;
+    transition: transform 0.3s ease;
+    opacity: 0.5;
+    pointer-events: none; /* Let clicks pass to the link */
+}
+
+.has-dropdown.open .chevron {
+    transform: rotate(90deg);
+}
+
+.sub-menu {
+    list-style: none;
+    padding-left: 0;
+    margin-left: 30px;
+    border-left: 1px solid var(--border-color);
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease-out, opacity 0.3s ease;
+    opacity: 0;
+    position: relative;
+    z-index: 101;
+}
+
+.has-dropdown.open .sub-menu {
+    max-height: 200px; /* Large enough for content */
+    opacity: 1;
+    margin-top: 5px;
+    margin-bottom: 5px;
+}
+
+.sub-menu li {
+    margin-bottom: 2px;
+}
+
+.sub-menu a {
+    display: block;
+    padding: 8px 15px;
+    font-size: 0.8rem;
+    color: #737373;
+    border-radius: 6px;
+    transition: all 0.2s;
+    text-decoration: none;
+    position: relative;
+    z-index: 103;
+}
+
+.sub-menu a:hover {
+    background: #f5f5f5;
+    color: var(--accent-color);
+}
+
+.sub-menu a.active {
+    color: var(--accent-color);
+    font-weight: 600;
+}
+
 .logout-btn {
     margin-top: auto;
     border-top: 1px solid var(--border-color);
@@ -174,4 +254,90 @@ body {
     width: 100%;
     max-width: 420px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Dropdown Actions Menu */
+.actions-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.action-dot-btn {
+    background: #f5f5f5;
+    border: 1px solid var(--border-color);
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #525252;
+    transition: all 0.2s;
+}
+
+.action-dot-btn:hover {
+    background: #eeeeee;
+    color: var(--accent-color);
+}
+
+.dropdown-menu {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    margin-top: 8px;
+    background: white;
+    border: 1px solid var(--border-color);
+    border-radius: 10px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+    min-width: 140px;
+    display: none;
+    overflow: hidden;
+}
+
+.dropdown-menu.show {
+    display: block;
+    animation: fadeInScale 0.15s ease-out;
+}
+
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 15px;
+    color: #525252;
+    text-decoration: none;
+    font-size: 0.85rem;
+    font-weight: 500;
+    transition: background 0.2s;
+    border: none;
+    width: 100%;
+    text-align: left;
+    background: none;
+    cursor: pointer;
+}
+
+.dropdown-item:hover {
+    background: #f8fafc;
+    color: var(--accent-color);
+}
+
+.dropdown-item i {
+    width: 16px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.dropdown-item.delete {
+    color: var(--danger-color);
+}
+
+.dropdown-item.delete:hover {
+    background: #fef2f2;
 }
