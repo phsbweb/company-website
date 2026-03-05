@@ -5,11 +5,15 @@ require_once '../../user/attendance/db_connect.php';
 $message = "";
 $error = "";
 
+// Fetch Departments
+$departments = $pdo->query("SELECT * FROM departments ORDER BY name ASC")->fetchAll();
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $full_name = trim($_POST['full_name'] ?? '');
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
     $shift = $_POST['working_shift'] ?? '8-5';
+    $department_id = !empty($_POST['department_id']) ? $_POST['department_id'] : null;
 
     if (empty($full_name) || empty($username) || empty($password)) {
         $error = "All fields are required.";
@@ -22,8 +26,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $error = "Username already taken.";
             } else {
                 $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-                $stmt = $pdo->prepare("INSERT INTO employees (full_name, username, password, working_shift) VALUES (?, ?, ?, ?)");
-                $stmt->execute([$full_name, $username, $hashed_password, $shift]);
+                $stmt = $pdo->prepare("INSERT INTO employees (full_name, username, password, working_shift, department_id) VALUES (?, ?, ?, ?, ?)");
+                $stmt->execute([$full_name, $username, $hashed_password, $shift, $department_id]);
 
                 $_SESSION['success_msg'] = "Employee added successfully.";
                 header("Location: employees.php");
@@ -114,6 +118,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                         <select name="working_shift">
                             <option value="8-5">8:00 AM - 5:00 PM</option>
                             <option value="830-530">8:30 AM - 5:30 PM</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <select name="department_id">
+                            <option value="">No Department</option>
+                            <?php foreach ($departments as $dept): ?>
+                                <option value="<?php echo $dept['id']; ?>"><?php echo htmlspecialchars($dept['name']); ?></option>
+                            <?php endforeach; ?>
                         </select>
                     </div>
                     <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px; padding: 14px;">

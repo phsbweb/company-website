@@ -44,6 +44,30 @@ foreach ($raw_records as $record) {
     $attendance_map[$date][] = $record;
 }
 
+// Fetch Approved Leaves for this month
+$stmt = $pdo->prepare("SELECT * FROM leaves WHERE employee_id = ? AND status = 'approved' AND (DATE_FORMAT(start_date, '%Y-%m') = ? OR DATE_FORMAT(end_date, '%Y-%m') = ?)");
+$stmt->execute([$employee_id, $selected_month, $selected_month]);
+$leaves = $stmt->fetchAll();
+
+// Map leaves to dates
+$leave_map = [];
+foreach ($leaves as $leave) {
+    $start = strtotime($leave['start_date']);
+    $end = strtotime($leave['end_date']);
+
+    // Iterate through leave range
+    for ($current = $start; $current <= $end; $current = strtotime('+1 day', $current)) {
+        $date_str = date('Y-m-d', $current);
+        // Only map if within selected month
+        if (date('Y-m', $current) === $selected_month) {
+            $leave_map[$date_str] = [
+                'type' => $leave['leave_type'],
+                'session' => $leave['day_session']
+            ];
+        }
+    }
+}
+
 // Summary Logic
 $days_present = count($attendance_map);
 $days_absent = 0;
@@ -83,16 +107,30 @@ function calculateWorkSeconds($checkIn, $checkOut, $shift)
 }
 
 // Pre-calculate days and hours
+$days_on_leave = 0;
 for ($d = 1; $d <= $days_in_month; $d++) {
     $current_date = sprintf("%s-%02d", $selected_month, $d);
     $day_of_week = date('N', strtotime($current_date));
     $is_weekend = ($day_of_week >= 6); // 6 for Sat, 7 for Sun
+    $has_leave = isset($leave_map[$current_date]);
 
     if (isset($attendance_map[$current_date])) {
         foreach ($attendance_map[$current_date] as $log) {
             $times = calculateWorkSeconds($log['check_in'], $log['check_out'], $employee['working_shift']);
             $total_seconds += $times['regular'];
             $total_ot_seconds += $times['ot'];
+        }
+        if ($has_leave && $leave_map[$current_date]['session'] !== 'Full Day') {
+            $days_on_leave += 0.5;
+        }
+    } elseif ($has_leave) {
+        if ($leave_map[$current_date]['session'] === 'Full Day') {
+            $days_on_leave += 1;
+        } else {
+            $days_on_leave += 0.5;
+            if (!$is_weekend && strtotime($current_date) <= time()) {
+                $days_absent += 0.5;
+            }
         }
     } elseif (!$is_weekend && strtotime($current_date) <= time()) {
         $days_absent++;
@@ -215,6 +253,12 @@ $formatted_ot_hours = "{$oth}h {$otm}m";
             color: #475569;
         }
 
+        .pill-leave {
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+        }
+
         .filter-section {
             background: white;
             padding: 20px;
@@ -295,6 +339,10 @@ $formatted_ot_hours = "{$oth}h {$otm}m";
                 <h3>Days Absent</h3>
                 <div class="value"><?php echo $days_absent; ?></div>
             </div>
+            <div class="stat-card" style="border-top: 4px solid #0ea5e9;">
+                <h3>Days on Leave</h3>
+                <div class="value" style="color: #0369a1;"><?php echo $days_on_leave; ?></div>
+            </div>
             <div class="stat-card" style="border-top: 4px solid var(--accent-color);">
                 <h3>Total Regular Hours</h3>
                 <div class="value"><?php echo $formatted_hours; ?></div>
@@ -335,6 +383,17 @@ $formatted_ot_hours = "{$oth}h {$otm}m";
                             <td>
                                 <?php if ($logs): ?>
                                     <span class="status-pill pill-present">PRESENT</span>
+                                    <?php if (isset($leave_map[$current_date])): ?>
+                                        <br><span class="status-pill pill-leave" style="margin-top: 4px; font-size: 0.65rem;">
+                                            <?php echo strtoupper($leave_map[$current_date]['session']); ?> LEAVE
+                                        </span>
+                                    <?php endif; ?>
+                                <?php elseif (isset($leave_map[$current_date])): ?>
+                                    <span class="status-pill pill-leave">
+                                        <?php
+                                        echo ($leave_map[$current_date]['session'] === 'Full Day') ? 'ON LEAVE' : strtoupper($leave_map[$current_date]['session']) . ' LEAVE';
+                                        ?>
+                                    </span>
                                 <?php elseif ($is_weekend): ?>
                                     <span class="status-pill pill-weekend">WEEKEND</span>
                                 <?php elseif ($is_future): ?>

@@ -4,9 +4,13 @@ require_once '../../user/attendance/db_connect.php';
 
 // Handle Search and Pagination
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
+$selected_dept = isset($_GET['department_id']) ? $_GET['department_id'] : '';
 $page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
 $limit = 10;
 $offset = ($page - 1) * $limit;
+
+// Fetch Departments for Filter
+$departments = $pdo->query("SELECT * FROM departments ORDER BY name ASC")->fetchAll();
 
 try {
     // Count total for pagination
@@ -17,6 +21,10 @@ try {
         $params[] = "%$search%";
         $params[] = "%$search%";
     }
+    if (!empty($selected_dept)) {
+        $count_query .= " AND department_id = ?";
+        $params[] = $selected_dept;
+    }
 
     $stmt_count = $pdo->prepare($count_query);
     $stmt_count->execute($params);
@@ -24,9 +32,15 @@ try {
     $total_pages = ceil($total_records / $limit);
 
     // Fetch employees
-    $query = "SELECT * FROM employees WHERE 1=1";
+    $query = "SELECT e.*, d.name as department_name 
+              FROM employees e 
+              LEFT JOIN departments d ON e.department_id = d.id 
+              WHERE 1=1";
     if (!empty($search)) {
         $query .= " AND (full_name LIKE ? OR username LIKE ?)";
+    }
+    if (!empty($selected_dept)) {
+        $query .= " AND e.department_id = ?";
     }
     $query .= " ORDER BY full_name ASC LIMIT ? OFFSET ?";
 
@@ -79,14 +93,24 @@ unset($_SESSION['success_msg'], $_SESSION['error_msg']);
         <?php endif; ?>
 
         <div class="admin-card" style="padding: 20px; margin-bottom: 20px;">
-            <form action="employees.php" method="GET" style="display: flex; gap: 10px;">
-                <input type="text" name="search" placeholder="Search by name or username..."
+            <form action="employees.php" method="GET" style="display: flex; gap: 10px; align-items: center;">
+                <input type="text" name="search" placeholder="Search name or username..."
                     value="<?php echo htmlspecialchars($search); ?>"
                     style="flex-grow: 1; padding: 10px; border: 1px solid var(--border-color); border-radius: 8px;">
+
+                <select name="department_id" style="padding: 10px; border: 1px solid var(--border-color); border-radius: 8px; min-width: 150px;">
+                    <option value="">All Departments</option>
+                    <?php foreach ($departments as $dept): ?>
+                        <option value="<?php echo $dept['id']; ?>" <?php echo ($selected_dept == $dept['id']) ? 'selected' : ''; ?>>
+                            <?php echo htmlspecialchars($dept['name']); ?>
+                        </option>
+                    <?php endforeach; ?>
+                </select>
+
                 <button type="submit" class="btn-primary" style="padding: 10px 20px;">
-                    <i class="fas fa-search"></i> Search
+                    <i class="fas fa-search"></i> Filter
                 </button>
-                <?php if (!empty($search)): ?>
+                <?php if (!empty($search) || !empty($selected_dept)): ?>
                     <a href="employees.php" class="btn-primary" style="background: #737373; padding: 10px 20px;">
                         <i class="fas fa-times"></i> Clear
                     </a>
@@ -106,6 +130,7 @@ unset($_SESSION['success_msg'], $_SESSION['error_msg']);
                         <tr>
                             <th>Full Name</th>
                             <th>Username</th>
+                            <th>Department</th>
                             <th>Default Shift</th>
                             <th>Date Joined</th>
                             <th style="text-align: center;">Actions</th>
@@ -119,6 +144,15 @@ unset($_SESSION['success_msg'], $_SESSION['error_msg']);
                                     <div style="font-size: 0.8rem; color: #737373;">ID: #<?php echo str_pad($emp['id'], 4, '0', STR_PAD_LEFT); ?></div>
                                 </td>
                                 <td><?php echo htmlspecialchars($emp['username']); ?></td>
+                                <td>
+                                    <?php if ($emp['department_name']): ?>
+                                        <span style="background: #eff6ff; color: #2563eb; padding: 4px 10px; border-radius: 50px; font-size: 0.8rem; font-weight: 600;">
+                                            <?php echo htmlspecialchars($emp['department_name']); ?>
+                                        </span>
+                                    <?php else: ?>
+                                        <span style="color: #a3a3a3; font-style: italic; font-size: 0.85rem;">None</span>
+                                    <?php endif; ?>
+                                </td>
                                 <td>
                                     <span class="status-badge" style="background: #f3f4f6; color: #4b5563;">
                                         <?php echo $emp['working_shift'] === '830-530' ? '8:30 - 5:30' : '8:00 - 5:00'; ?>

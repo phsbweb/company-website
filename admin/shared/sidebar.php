@@ -12,7 +12,7 @@ $baseUrl = $baseUrl ?? '../';
                 <i class="fas fa-th-large"></i> Dashboard
             </a>
         </li>
-        <li class="has-dropdown <?php echo ($activePage == 'employees' || $activePage == 'attendance' || $activePage == 'leaves') ? 'active open' : ''; ?>">
+        <li class="has-dropdown <?php echo ($activePage == 'employees' || $activePage == 'attendance' || $activePage == 'leaves' || $activePage == 'departments') ? 'active open' : ''; ?>">
             <a href="javascript:void(0)" class="dropdown-toggle">
                 <i class="fas fa-users"></i> Employees
                 <i class="fas fa-chevron-right chevron"></i>
@@ -31,6 +31,11 @@ $baseUrl = $baseUrl ?? '../';
                 <li>
                     <a href="<?php echo $baseUrl; ?>employees/leaves.php" class="<?php echo ($activePage == 'leaves') ? 'active' : ''; ?>">
                         Leaves
+                    </a>
+                </li>
+                <li>
+                    <a href="<?php echo $baseUrl; ?>employees/departments.php" class="<?php echo ($activePage == 'departments') ? 'active' : ''; ?>">
+                        Departments
                     </a>
                 </li>
             </ul>
