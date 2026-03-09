@@ -11,6 +11,11 @@ $employee_id = $_SESSION['user_id'];
 $message = "";
 $error = "";
 
+// Fetch All Holiday Ranges
+$stmt_h = $pdo->query("SELECT start_date, end_date FROM holidays");
+$all_holiday_ranges = $stmt_h->fetchAll();
+$holidays_json = json_encode($all_holiday_ranges);
+
 // Fetch Entitlements & Calculate Balances
 $stmt = $pdo->prepare("SELECT annual_leave_entitlement, medical_leave_entitlement FROM employees WHERE id = ?");
 $stmt->execute([$employee_id]);
@@ -50,11 +55,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     $end_date = ($day_session !== 'Full Day') ? $start_date : ($_POST['end_date'] ?? '');
     $reason = $_POST['reason'] ?? '';
 
-    // Calculate total days
+    // Calculate total days (excluding weekends and holidays)
     if ($day_session !== 'Full Day') {
         $total_days = 0.5;
     } elseif (!empty($start_date) && !empty($end_date)) {
-        $total_days = (strtotime($end_date) - strtotime($start_date)) / (60 * 60 * 24) + 1;
+        $total_days = 0;
+        $current = strtotime($start_date);
+        $end = strtotime($end_date);
+
+        while ($current <= $end) {
+            $date_str = date('Y-m-d', $current);
+            $day_of_week = date('N', $current);
+            $is_weekend = ($day_of_week >= 6); // 6=Sat, 7=Sun
+            $is_holiday = false;
+            foreach ($all_holiday_ranges as $range) {
+                if ($date_str >= $range['start_date'] && $date_str <= $range['end_date']) {
+                    $is_holiday = true;
+                    break;
+                }
+            }
+
+            if (!$is_weekend && !$is_holiday) {
+                $total_days++;
+            }
+            $current = strtotime('+1 day', $current);
+        }
     } else {
         $total_days = 0;
     }
@@ -448,6 +473,8 @@ $leaves = $stmt->fetchAll();
             }
         };
 
+        const holidays = <?php echo $holidays_json; ?>;
+
         function toggleEntitlementInfo() {
             const select = document.getElementById('leave_type');
             const info = document.getElementById('entitlement-info');
@@ -507,7 +534,22 @@ $leaves = $stmt->fetchAll();
 
             if (session !== 'Full Day') {
                 if (start) {
-                    display.innerText = "0.5";
+                    const d = new Date(start);
+                    const dayOfWeek = d.getDay(); // 0=Sun, 6=Sat
+                    const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+                    let isHoliday = false;
+                    for (let range of holidays) {
+                        if (start >= range.start_date && start <= range.end_date) {
+                            isHoliday = true;
+                            break;
+                        }
+                    }
+
+                    if (isWeekend || isHoliday) {
+                        display.innerText = "0";
+                    } else {
+                        display.innerText = "0.5";
+                    }
                     badge.style.display = 'block';
                 } else {
                     badge.style.display = 'none';
@@ -519,8 +561,27 @@ $leaves = $stmt->fetchAll();
                 const startDate = new Date(start);
                 const endDate = new Date(end);
                 if (endDate >= startDate) {
-                    const diffTime = Math.abs(endDate - startDate);
-                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                    let diffDays = 0;
+                    let current = new Date(startDate);
+
+                    while (current <= endDate) {
+                        const dateStr = current.toISOString().split('T')[0];
+                        const dayOfWeek = current.getDay(); // 0=Sun, 6=Sat
+                        const isWeekend = (dayOfWeek === 0 || dayOfWeek === 6);
+                        let isHoliday = false;
+                        for (let range of holidays) {
+                            if (dateStr >= range.start_date && dateStr <= range.end_date) {
+                                isHoliday = true;
+                                break;
+                            }
+                        }
+
+                        if (!isWeekend && !isHoliday) {
+                            diffDays++;
+                        }
+                        current.setDate(current.getDate() + 1);
+                    }
+
                     display.innerText = diffDays;
                     badge.style.display = 'block';
                     return;

@@ -21,8 +21,19 @@ try {
     ]);
 
     $attendanceCount = $att_pdo->query("SELECT COUNT(*) FROM attendance WHERE DATE(created_at) = CURDATE()")->fetchColumn();
+
+    // Fetch Who's In Now (Active Sessions)
+    $stmt_active = $att_pdo->query("
+        SELECT a.*, e.full_name, d.name as dept_name 
+        FROM attendance a
+        JOIN employees e ON a.employee_id = e.id
+        LEFT JOIN departments d ON e.department_id = d.id
+        WHERE a.status = 'checked_in' AND DATE(a.check_in) = CURDATE()
+        ORDER BY a.check_in DESC
+    ");
+    $active_sessions = $stmt_active->fetchAll();
 } catch (Exception $e) {
-    // Keep 0 if failed
+    $active_sessions = [];
 }
 ?>
 <!DOCTYPE html>
@@ -85,6 +96,146 @@ try {
             font-weight: 800;
             color: var(--accent-color);
         }
+
+        /* Who's In Now Widget */
+        .active-sessions-card {
+            background: #ffffff;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            margin-top: 30px;
+            overflow: hidden;
+        }
+
+        .card-header {
+            padding: 20px 25px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h3 {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #ef4444;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            background: #ef4444;
+            border-radius: 50%;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7);
+            }
+
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+            }
+
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+
+        .session-list {
+            padding: 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .session-item {
+            display: flex;
+            align-items: center;
+            padding: 15px 25px;
+            border-bottom: 1px solid #f5f5f5;
+            transition: background 0.2s;
+        }
+
+        .session-item:last-child {
+            border-bottom: none;
+        }
+
+        .session-item:hover {
+            background: #fafafa;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: #eff6ff;
+            color: #2563eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+
+        .session-details {
+            flex-grow: 1;
+        }
+
+        .session-details .name {
+            font-weight: 600;
+            font-size: 0.95rem;
+            display: block;
+        }
+
+        .session-details .dept {
+            font-size: 0.75rem;
+            color: #737373;
+        }
+
+        .session-time {
+            text-align: right;
+            margin-right: 20px;
+        }
+
+        .session-time .time {
+            display: block;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .session-time .label {
+            font-size: 0.7rem;
+            color: #737373;
+            text-transform: uppercase;
+        }
+
+        .location-link {
+            padding: 8px;
+            background: #f5f5f5;
+            color: #737373;
+            border-radius: 8px;
+            transition: all 0.2s;
+            text-decoration: none;
+        }
+
+        .location-link:hover {
+            background: var(--accent-color);
+            color: white;
+        }
     </style>
 </head>
 
@@ -129,6 +280,51 @@ try {
                     <h3>Checked In Today</h3>
                     <p><?php echo $attendanceCount; ?></p>
                 </div>
+            </div>
+        </div>
+
+        <!-- Who's In Now Widget -->
+        <div class="active-sessions-card">
+            <div class="card-header">
+                <h3>Who's In Now</h3>
+                <div class="live-indicator">
+                    <span class="live-dot"></span>
+                    Live
+                </div>
+            </div>
+            <div class="session-list">
+                <?php if (empty($active_sessions)): ?>
+                    <div style="padding: 40px; text-align: center; color: #737373;">
+                        <i class="fas fa-users-slash" style="font-size: 2rem; margin-bottom: 10px; opacity: 0.3;"></i>
+                        <p>No active sessions found.</p>
+                    </div>
+                <?php else: ?>
+                    <?php foreach ($active_sessions as $session): ?>
+                        <div class="session-item">
+                            <div class="user-avatar">
+                                <?php echo strtoupper(substr($session['full_name'], 0, 1)); ?>
+                            </div>
+                            <div class="session-details">
+                                <span class="name"><?php echo htmlspecialchars($session['full_name']); ?></span>
+                                <span class="dept"><?php echo htmlspecialchars($session['dept_name'] ?? 'No Department'); ?></span>
+                            </div>
+                            <div class="session-time">
+                                <span class="time"><?php echo date('H:i', strtotime($session['check_in'])); ?></span>
+                                <span class="label">Checked In</span>
+                            </div>
+                            <?php if ($session['location_in']): ?>
+                                <a href="https://www.google.com/maps/search/?api=1&query=<?php echo urlencode($session['location_in']); ?>"
+                                    target="_blank" class="location-link" title="See Location: <?php echo htmlspecialchars($session['location_in']); ?>">
+                                    <i class="fas fa-location-dot"></i>
+                                </a>
+                            <?php else: ?>
+                                <span class="location-link" style="opacity: 0.3; cursor: not-allowed;" title="No location data">
+                                    <i class="fas fa-location-dot"></i>
+                                </span>
+                            <?php endif; ?>
+                        </div>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </div>
         </div>
     </div>

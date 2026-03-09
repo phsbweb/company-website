@@ -19,6 +19,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $stmt = $pdo->prepare("UPDATE leaves SET status = ? WHERE id = ?");
         $stmt->execute([$status, $leave_id]);
 
+        // Log Change
+        require_once '../shared/logger.php';
+        logAction($pdo, $_SESSION['admin_user_id'], $_SESSION['admin_username'], ucfirst($status) . ' Leave', 'Leave', $leave_id, "Leave request status changed to $status");
+
         $_SESSION['success_msg'] = "Leave request " . ucfirst($status) . " successfully.";
         header("Location: leaves.php");
         exit;

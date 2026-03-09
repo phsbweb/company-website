@@ -170,6 +170,9 @@ unset($_SESSION['success_msg'], $_SESSION['error_msg']);
                                             <a href="edit-employee.php?id=<?php echo $emp['id']; ?>" class="dropdown-item">
                                                 <i class="fas fa-edit" style="color: #2563eb;"></i> Edit
                                             </a>
+                                            <a href="../schedules/attendance-report.php?employee_id=<?php echo $emp['id']; ?>" class="dropdown-item">
+                                                <i class="fas fa-calendar-check" style="color: #10b981;"></i> Attendance
+                                            </a>
                                             <form action="delete-employee.php" method="POST" style="display:contents;"
                                                 onsubmit="return confirm('Are you sure you want to delete this employee? This will also remove their attendance history.');">
                                                 <input type="hidden" name="id" value="<?php echo $emp['id']; ?>">

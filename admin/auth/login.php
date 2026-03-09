@@ -14,7 +14,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             if ($user && password_verify($password, $user['password'])) {
                 $_SESSION['admin_logged_in'] = true;
+                $_SESSION['admin_user_id'] = $user['id'];
                 $_SESSION['admin_username'] = $user['username'];
+
+                // Log login
+                require_once '../shared/logger.php';
+                logAction($pdo, $user['id'], $user['username'], 'Login', 'Admin', $user['id'], 'Admin logged in successfully');
+
                 header('Location: ../dashboard/dashboard.php');
                 exit;
             } else {
