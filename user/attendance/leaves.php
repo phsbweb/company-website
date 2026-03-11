@@ -17,10 +17,25 @@ $all_holiday_ranges = $stmt_h->fetchAll();
 $holidays_json = json_encode($all_holiday_ranges);
 
 // Fetch Entitlements & Calculate Balances
-$stmt = $pdo->prepare("SELECT annual_leave_entitlement, medical_leave_entitlement FROM employees WHERE id = ?");
+$stmt = $pdo->prepare("SELECT annual_leave_entitlement, medical_leave_entitlement, working_shift FROM employees WHERE id = ?");
 $stmt->execute([$employee_id]);
 $entitlement_raw = $stmt->fetch();
 $annual_entitlement = $entitlement_raw['annual_leave_entitlement'] ?? 18;
+
+// Get current attendance status for reminders
+$stmt_att = $pdo->prepare("SELECT status, check_in FROM attendance WHERE employee_id = ? ORDER BY created_at DESC LIMIT 1");
+$stmt_att->execute([$employee_id]);
+$current_att = $stmt_att->fetch();
+$isCheckedIn = false;
+if ($current_att && $current_att['status'] === 'checked_in') {
+    if (date('Y-m-d', strtotime($current_att['check_in'])) === date('Y-m-d')) {
+        $isCheckedIn = true;
+    }
+}
+
+$working_shift = $entitlement_raw['working_shift'] ?? '800-500';
+$shift_start = ($working_shift === '830-530') ? "08:30" : "08:00";
+$shift_end = ($working_shift === '830-530') ? "17:30" : "17:00";
 
 // Fetch taken annual leave (approved)
 $stmt = $pdo->prepare("SELECT SUM(total_days) as taken FROM leaves WHERE employee_id = ? AND leave_type = 'Annual' AND status = 'approved'");
@@ -90,8 +105,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
         $error = "Start date cannot be after end date.";
     } else {
         try {
-            $stmt = $pdo->prepare("INSERT INTO leaves (employee_id, leave_type, start_date, end_date, reason, day_session, total_days) VALUES (?, ?, ?, ?, ?, ?, ?)");
-            $stmt->execute([$employee_id, $leave_type, $start_date, $end_date, $reason, $day_session, $total_days]);
+            $document_path = NULL;
+            if (isset($_FILES['mc_file']) && $_FILES['mc_file']['error'] === UPLOAD_ERR_OK) {
+                $file_tmp = $_FILES['mc_file']['tmp_name'];
+                $file_name = time() . '_' . basename($_FILES['mc_file']['name']);
+                $upload_dir = 'uploads/mc/';
+                $document_path = $upload_dir . $file_name;
+                move_uploaded_file($file_tmp, $document_path);
+            }
+
+            $stmt = $pdo->prepare("INSERT INTO leaves (employee_id, leave_type, start_date, end_date, reason, day_session, total_days, document_path) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+            $stmt->execute([$employee_id, $leave_type, $start_date, $end_date, $reason, $day_session, $total_days, $document_path]);
             $message = "Leave request submitted successfully.";
             // Refresh to show new history items
             $_SESSION['success_msg'] = $message;
@@ -99,6 +123,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             exit;
         } catch (PDOException $e) {
             $error = "Failed to submit request: " . $e->getMessage();
+        }
+    }
+}
+
+// Handle Leave Cancellation
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['action'] === 'cancel_leave') {
+    $leave_id = $_POST['leave_id'] ?? '';
+    if (!empty($leave_id)) {
+        try {
+            // Ensure the leave belongs to the user and is still pending
+            $stmt = $pdo->prepare("UPDATE leaves SET status = 'cancelled' WHERE id = ? AND employee_id = ? AND status = 'pending'");
+            $stmt->execute([$leave_id, $employee_id]);
+
+            if ($stmt->rowCount() > 0) {
+                // Log action
+                require_once '../../admin/shared/logger.php';
+                logAction($pdo, $employee_id, $_SESSION['full_name'], 'Cancel Leave', 'Leave', $leave_id, "Employee cancelled their own pending leave request");
+
+                $_SESSION['success_msg'] = "Leave request cancelled successfully.";
+            } else {
+                $_SESSION['error_msg'] = "Failed to cancel leave or it's no longer pending.";
+            }
+            header("Location: leaves.php");
+            exit;
+        } catch (PDOException $e) {
+            $error = "Database error: " . $e->getMessage();
         }
     }
 }
@@ -223,6 +273,11 @@ $leaves = $stmt->fetchAll();
             color: #991b1b;
         }
 
+        .status-cancelled {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
         .btn-submit {
             background: var(--primary-color);
             color: white;
@@ -233,6 +288,25 @@ $leaves = $stmt->fetchAll();
             font-weight: 600;
             cursor: pointer;
             margin-top: 0.5rem;
+        }
+
+        .btn-cancel {
+            background: #fff;
+            color: #ef4444;
+            border: 1px solid #fee2e2;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.02em;
+        }
+
+        .btn-cancel:hover {
+            background: #fef2f2;
+            border-color: #fecaca;
         }
 
         /* Entitlement Info Card */
@@ -303,6 +377,7 @@ $leaves = $stmt->fetchAll();
         <div class="nav-tabs">
             <a href="dashboard.php" class="nav-tab">Attendance</a>
             <a href="leaves.php" class="nav-tab active">Leave Requests</a>
+            <a href="directory.php" class="nav-tab">Directory</a>
         </div>
 
         <?php if ($message): ?>
@@ -319,7 +394,7 @@ $leaves = $stmt->fetchAll();
 
         <div class="leave-form">
             <h3>New Request</h3>
-            <form action="leaves.php" method="POST" style="margin-top: 1rem;">
+            <form action="leaves.php" method="POST" enctype="multipart/form-data" style="margin-top: 1rem;">
                 <input type="hidden" name="action" value="submit_leave">
                 <div class="form-group">
                     <label>Leave Type</label>
@@ -389,6 +464,11 @@ $leaves = $stmt->fetchAll();
                     <label id="reason_label">Reason</label>
                     <textarea name="reason" id="reason" rows="3" placeholder="Explain your reason for leave..."></textarea>
                 </div>
+                <div class="form-group" id="mc_upload_group" style="display: none;">
+                    <label>Attachment (MC / Supporting Document)</label>
+                    <input type="file" name="mc_file" id="mc_file" accept=".jpg,.jpeg,.png,.pdf">
+                    <small style="color: #64748b;">Allowed types: JPG, PNG, PDF</small>
+                </div>
                 <button type="submit" class="btn-submit">Submit Request</button>
             </form>
         </div>
@@ -406,7 +486,7 @@ $leaves = $stmt->fetchAll();
                         <tr>
                             <th>Type</th>
                             <th>Dates</th>
-                            <th>Status</th>
+                            <th style="text-align: right;">Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -430,9 +510,20 @@ $leaves = $stmt->fetchAll();
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="status-badge status-<?php echo $leave['status']; ?>">
-                                        <?php echo $leave['status']; ?>
-                                    </span>
+                                    <div style="display: flex; flex-direction: column; gap: 8px; align-items: flex-end;">
+                                        <span class="status-badge status-<?php echo $leave['status']; ?>" style="margin: 0; display: block;">
+                                            <?php echo $leave['status']; ?>
+                                        </span>
+                                        <?php if ($leave['status'] === 'pending'): ?>
+                                            <form action="leaves.php" method="POST" onsubmit="return confirm('Are you sure you want to cancel this leave request?');" style="margin: 0; line-height: 1.2;">
+                                                <input type="hidden" name="action" value="cancel_leave">
+                                                <input type="hidden" name="leave_id" value="<?php echo $leave['id']; ?>">
+                                                <button type="submit" class="btn-cancel" style="margin: 0;">
+                                                    <i class="fas fa-times"></i> Cancel
+                                                </button>
+                                            </form>
+                                        <?php endif; ?>
+                                    </div>
                                 </td>
                             </tr>
                         <?php endforeach; ?>
@@ -492,6 +583,12 @@ $leaves = $stmt->fetchAll();
                 info.style.display = 'block';
             } else {
                 info.style.display = 'none';
+            }
+
+            if (type === 'Medical' || type === 'Hospitalization') {
+                document.getElementById('mc_upload_group').style.display = 'block';
+            } else {
+                document.getElementById('mc_upload_group').style.display = 'none';
             }
 
             if (type === 'Other') {
@@ -590,6 +687,15 @@ $leaves = $stmt->fetchAll();
             badge.style.display = 'none';
         }
     </script>
+    <script>
+        window.attendanceData = {
+            isCheckedIn: <?php echo $isCheckedIn ? 'true' : 'false'; ?>,
+            shiftStart: "<?php echo $shift_start; ?>",
+            shiftEnd: "<?php echo $shift_end; ?>",
+            userId: <?php echo $_SESSION['user_id']; ?>
+        };
+    </script>
+    <script src="reminders.js"></script>
 </body>
 
 </html>

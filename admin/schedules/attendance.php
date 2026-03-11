@@ -227,6 +227,19 @@ try {
             color: #475569;
         }
 
+        .late-badge {
+            background: #fef2f2;
+            color: #991b1b;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            margin-top: 4px;
+            display: inline-block;
+            border: 1px solid #fee2e2;
+            text-transform: uppercase;
+        }
+
         .action-btn {
             background: none;
             border: none;
@@ -446,6 +459,9 @@ try {
                                 <td>
                                     <div style="font-weight: 500;"><?php echo date('h:i A', strtotime($row['check_in'])); ?></div>
                                     <div style="font-size: 0.75rem; color: #737373;"><?php echo date('d M Y', strtotime($row['check_in'])); ?></div>
+                                    <?php if (($row['is_late'] ?? 0) == 1): ?>
+                                        <span class="late-badge">Late Check-in</span>
+                                    <?php endif; ?>
                                 </td>
                                 <td>
                                     <?php if ($row['check_out']): ?>

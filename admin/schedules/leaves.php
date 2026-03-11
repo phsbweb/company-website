@@ -97,6 +97,12 @@ $leaves = $pdo->query($query)->fetchAll();
             border: 1px solid #fecaca;
         }
 
+        .status-cancelled {
+            background: #f1f5f9;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+        }
+
         .action-btns {
             display: flex;
             gap: 10px;
@@ -198,6 +204,13 @@ $leaves = $pdo->query($query)->fetchAll();
                             </div>
                             <?php if ($leave['reason']): ?>
                                 <div class="reason-box">"<?php echo htmlspecialchars($leave['reason']); ?>"</div>
+                            <?php endif; ?>
+                            <?php if ($leave['document_path']): ?>
+                                <div style="margin-top: 10px;">
+                                    <a href="../../user/attendance/<?php echo htmlspecialchars($leave['document_path']); ?>" target="_blank" style="font-size: 0.85rem; color: #2563eb; text-decoration: none; font-weight: 600;">
+                                        <i class="fas fa-paperclip"></i> View Attachment
+                                    </a>
+                                </div>
                             <?php endif; ?>
                         </div>
                         <div style="text-align: right;">
