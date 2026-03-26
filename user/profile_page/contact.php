@@ -166,14 +166,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </section>
 
-    <!-- CTA Section -->
-    <section class="section-padding cta-section snap-section">
-        <div class="container text-center">
-            <h2 class="section-title mb-20">Ready to build your next project?</h2>
-            <p class="card-desc mb-40">Partner with Priority Horizon for reliability and construction excellence.</p>
-            <a href="contact.php" class="btn btn-white">Get in Touch</a>
-        </div>
-    </section>
-
 </main>
-<?php include 'includes/footer.php'; ?>
+<?php include 'includes/footer.php'; ?>
