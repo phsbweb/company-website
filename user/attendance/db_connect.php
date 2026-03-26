@@ -1,10 +1,12 @@
 <?php
+require_once __DIR__ . '/../../env_loader.php';
+
 date_default_timezone_set('Asia/Kuala_Lumpur');
-$host = 'localhost';
-$db   = 'phsb';
-$user = 'root';
-$pass = '';
-$charset = 'utf8mb4';
+$host = getenv('DB_HOST') ?: 'localhost';
+$db   = getenv('DB_NAME') ?: 'phsb';
+$user = getenv('DB_USER') ?: 'root';
+$pass = getenv('DB_PASS') ?: '';
+$charset = getenv('DB_CHARSET') ?: 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db;charset=$charset";
 $options = [
