@@ -12,34 +12,38 @@
 </section>
 
 <main id="main-content">
-    <!-- Vision and Mission -->
+    <!-- Vision and Mission (Premium Overlapping Layout) -->
     <section class="section-padding snap-section">
         <div class="container">
-            <div class="intro-grid">
-                <!-- Vision -->
-                <div>
-                    <h2 class="vm-title">Our Vision</h2>
-                    <div class="glass-card vm-card">
-                        <p class="vm-text">
-                            To be recognized as a leading and reputable construction company in the construction industry for our first class service at competitive prices.
-                        </p>
-                    </div>
+            <div class="vm-editorial-container">
+                <!-- Left: Architectural Image -->
+                <div class="vm-image-col">
+                    <img src="assets/images/vm-bg.jpg" alt="Modern Architecture" class="vm-image">
                 </div>
 
-                <!-- Mission -->
-                <div>
-                    <h2 class="vm-title">Our Mission</h2>
-                    <div class="glass-card vm-card">
-                        <ul class="vm-list">
-                            <li>
-                                <i class="fas fa-check-circle vm-icon"></i>
-                                <span>PHSB aims to provide excellent and innovative quality service to our customers and to complete all our customers' projects on time to our customers' satisfaction.</span>
-                            </li>
-                            <li>
-                                <i class="fas fa-check-circle vm-icon"></i>
-                                <span>We achieve this by incorporating our professionalism, experience, expertise and quality standard to the highest professional quality to our customers' satisfaction.</span>
-                            </li>
-                        </ul>
+                <!-- Right: Overlapping Text Box -->
+                <div class="vm-text-col">
+                    <div class="vm-text-box">
+                        <div class="vm-section">
+                            <h2 class="vm-editorial-title">Our Vision</h2>
+                            <p class="vm-editorial-text">
+                                To be recognized as a leading and reputable construction company in the construction industry for our first class service at competitive prices.
+                            </p>
+                        </div>
+                        
+                        <div class="vm-section mt-60">
+                            <h2 class="vm-editorial-title">Our Mission</h2>
+                            <ul class="vm-editorial-list">
+                                <li>
+                                    <i class="fas fa-check vm-check"></i>
+                                    <span>PHSB aims to provide excellent and innovative quality service to our customers and to complete all our customers' projects on time to our customers' satisfaction.</span>
+                                </li>
+                                <li>
+                                    <i class="fas fa-check vm-check"></i>
+                                    <span>We achieve this by incorporating our professionalism, experience, expertise and quality standard to the highest professional quality to our customers' satisfaction.</span>
+                                </li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -47,7 +51,7 @@
     </section>
 
     <!-- Corporate Information -->
-    <section class="section-padding cta-section snap-section">
+    <section class="section-padding snap-section">
         <div class="container">
             <h2 class="section-title text-center mb-40">Corporate Information</h2>
             <div class="glass-card feature-card-padding">
@@ -97,53 +101,16 @@
         </div>
     </section>
 
-    <!-- Organization Team -->
-    <section class="section-padding snap-section">
 
-        <div class="container">
-            <h2 class="section-title text-center mb-50">Key Management Team</h2>
-            <div class="team-grid">
-                <!-- Team Member 1 -->
-                <div class="glass-card team-card">
-                    <div class="team-icon-box">
-                        <i class="fas fa-user team-icon"></i>
-                    </div>
-                    <h3 class="team-name">CHUNG PHAIK HONG</h3>
-                    <p class="team-role">Managing Director</p>
-                    <div class="team-separator"></div>
-                    <p class="team-desc">
-                        Leading Priority Horizon with extensive expertise in large-scale construction management and strategic corporate growth.
-                    </p>
-                </div>
-
-                <!-- Team Member 2 -->
-                <div class="glass-card team-card">
-                    <div class="team-icon-box">
-                        <i class="fas fa-user team-icon"></i>
-                    </div>
-                    <h3 class="team-name">KWA HOONG SIAN</h3>
-                    <p class="team-role">Project Director</p>
-                    <div class="team-separator"></div>
-                    <p class="team-desc">
-                        Overseeing project operations with a focus on structural integrity, timely delivery, and operational excellence across all phases.
-                    </p>
-                </div>
-
-                <!-- Team Member 3 -->
-                <div class="glass-card team-card">
-                    <div class="team-icon-box">
-                        <i class="fas fa-user-shield team-icon"></i>
-                    </div>
-                    <h3 class="team-name">DATO SRI' ISKANDAR SANI</h3>
-                    <p class="team-role">Advisor</p>
-                    <div class="team-separator"></div>
-                    <p class="team-desc">
-                        Providing high-level strategic guidance and industry insights to ensure PHSB maintains its competitive edge and standard of excellence.
-                    </p>
-                </div>
-            </div>
+    <!-- CTA Section -->
+    <section class="section-padding cta-section snap-section">
+        <div class="container text-center">
+            <h2 class="section-title mb-20">Ready to build your next project?</h2>
+            <p class="card-desc mb-40">Partner with Priority Horizon for reliability and construction excellence.</p>
+            <a href="contact.php" class="btn btn-white">Get in Touch</a>
         </div>
     </section>
 
 </main>
+
 <?php include 'includes/footer.php'; ?>

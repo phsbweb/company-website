@@ -94,9 +94,9 @@
     <!-- CTA Section -->
     <section class="section-padding cta-section snap-section">
         <div class="container text-center">
-            <h2 class="section-title mb-20">Need a specialized service?</h2>
-            <p class="card-desc mb-40">Contact us to discuss your specific project requirements.</p>
-            <a href="contact.php" class="btn">Get in Touch</a>
+            <h2 class="section-title mb-20">Ready to build your next project?</h2>
+            <p class="card-desc mb-40">Partner with Priority Horizon for reliability and construction excellence.</p>
+            <a href="contact.php" class="btn btn-white">Get in Touch</a>
         </div>
     </section>
 
