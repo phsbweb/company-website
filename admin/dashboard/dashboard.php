@@ -233,8 +233,24 @@ try {
         }
 
         .location-link:hover {
-            background: var(--accent-color);
-            color: white;
+            color: var(--accent-color);
+        }
+
+        .location-text {
+            display: block;
+            font-size: 0.75rem;
+            color: #737373;
+            margin-top: 4px;
+            max-width: 250px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            text-decoration: none;
+        }
+
+        .location-text:hover {
+            color: var(--accent-color);
+            text-decoration: underline;
         }
     </style>
 </head>
@@ -312,16 +328,19 @@ try {
                                 <span class="time"><?php echo date('H:i', strtotime($session['check_in'])); ?></span>
                                 <span class="label">Checked In</span>
                             </div>
-                            <?php if ($session['location_in']): ?>
-                                <a href="https://www.google.com/maps/search/?api=1&query=<?php echo urlencode($session['location_in']); ?>"
-                                    target="_blank" class="location-link" title="See Location: <?php echo htmlspecialchars($session['location_in']); ?>">
-                                    <i class="fas fa-location-dot"></i>
-                                </a>
-                            <?php else: ?>
-                                <span class="location-link" style="opacity: 0.3; cursor: not-allowed;" title="No location data">
-                                    <i class="fas fa-location-dot"></i>
-                                </span>
-                            <?php endif; ?>
+                            <div style="flex-shrink: 0;">
+                                <?php if ($session['location_in']): ?>
+                                    <a href="https://www.google.com/maps/search/?api=1&query=<?php echo urlencode($session['location_in']); ?>"
+                                        target="_blank" class="location-text" title="<?php echo htmlspecialchars($session['location_in']); ?>">
+                                        <i class="fas fa-location-dot" style="margin-right: 5px; opacity: 0.5;"></i>
+                                        <?php echo htmlspecialchars($session['location_in']); ?>
+                                    </a>
+                                <?php else: ?>
+                                    <span class="location-text" style="opacity: 0.3;">
+                                        <i class="fas fa-location-dot" style="margin-right: 5px;"></i> No location
+                                    </span>
+                                <?php endif; ?>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 <?php endif; ?>
