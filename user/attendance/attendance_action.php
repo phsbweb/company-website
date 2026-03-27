@@ -32,6 +32,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
                     $update = $pdo->prepare("UPDATE attendance SET check_out = ?, status = 'checked_out', location_out = 'Auto-Checkout (System)' WHERE id = ?");
                     $update->execute([$auto_checkout, $last_record['id']]);
+
+                    // Auto Logout: Clear device token and destroy session
+                    if (isset($_COOKIE['device_token'])) {
+                        $stmt = $pdo->prepare("DELETE FROM device_tokens WHERE token = ?");
+                        $stmt->execute([$_COOKIE['device_token']]);
+                        setcookie('device_token', '', time() - 3600, '/');
+                    }
+                    session_destroy();
+                    echo json_encode(['success' => false, 'redirect' => 'index.php?trace=auto_logout', 'message' => 'Session expired. Please login again.']);
+                    exit;
                 } else {
                     echo json_encode(['success' => false, 'message' => 'Already checked in']);
                     exit;

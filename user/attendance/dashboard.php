@@ -25,8 +25,16 @@ if ($current_status && $current_status['status'] === 'checked_in') {
         $update = $pdo->prepare("UPDATE attendance SET check_out = ?, status = 'checked_out', location_out = 'Auto-Checkout (System)' WHERE id = ?");
         $update->execute([$auto_checkout, $current_status['id']]);
 
-        // Refresh status after fix
-        $isCheckedIn = false;
+        // Auto Logout: Clear device token and destroy session
+        if (isset($_COOKIE['device_token'])) {
+            $stmt = $pdo->prepare("DELETE FROM device_tokens WHERE token = ?");
+            $stmt->execute([$_COOKIE['device_token']]);
+            setcookie('device_token', '', time() - 3600, '/');
+        }
+
+        session_destroy();
+        header("Location: index.php?trace=auto_logout");
+        exit;
     } else {
         $isCheckedIn = true;
     }

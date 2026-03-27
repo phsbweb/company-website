@@ -42,6 +42,18 @@ unset($_SESSION['error']);
         <h1>PHSB Attendance</h1>
         <p style="margin-bottom: 2rem; color: #64748b;">Please login to your account</p>
 
+        <?php if (isset($_GET['trace'])): ?>
+            <?php if ($_GET['trace'] === 'auto_logout'): ?>
+                <div class="info-msg" style="background: #eff6ff; color: #1e40af; border: 1px solid #bfdbfe; padding: 0.75rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.875rem;">
+                    You have been automatically logged out from your previous session. Please login for today.
+                </div>
+            <?php elseif ($_GET['trace'] === 'logout_success'): ?>
+                <div class="info-msg" style="background: #f0fdf4; color: #166534; border: 1px solid #bbf7d0; padding: 0.75rem; border-radius: 8px; margin-bottom: 1.5rem; font-size: 0.875rem;">
+                    Successfully logged out.
+                </div>
+            <?php endif; ?>
+        <?php endif; ?>
+
         <?php if ($error): ?>
             <?php if ($error === 'already_signed_in'): ?>
                 <script>

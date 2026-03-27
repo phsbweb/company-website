@@ -118,9 +118,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         window.location.href = 'index.php?trace=checkout_logout';
                     }
                 } else {
-                    alert(result.message || 'An error occurred.');
-                    attendanceBtn.textContent = originalText;
-                    attendanceBtn.disabled = false;
+                    if (result.redirect) {
+                        window.location.href = result.redirect;
+                    } else {
+                        alert(result.message || 'An error occurred.');
+                        attendanceBtn.textContent = originalText;
+                        attendanceBtn.disabled = false;
+                    }
                 }
             } catch (error) {
                 console.error('Attendance handling error:', error);
