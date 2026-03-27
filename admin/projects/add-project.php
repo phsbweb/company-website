@@ -5,7 +5,6 @@ include '../../user/profile_page/includes/db.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'] ?? '';
     $client = $_POST['client'] ?? '';
-    $status = isset($_POST['status']) && $_POST['status'] !== '' ? (int)$_POST['status'] : null;
 
 
     // Handle Image Upload
@@ -24,8 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    $stmt = $pdo->prepare("INSERT INTO projects (title, client, status, image_path) VALUES (?, ?, ?, ?)");
-    if ($stmt->execute([$title, $client, $status, $image_path])) {
+    $stmt = $pdo->prepare("INSERT INTO projects (title, client, image_path) VALUES (?, ?, ?)");
+    if ($stmt->execute([$title, $client, $image_path])) {
         header('Location: projects.php?msg=added');
         exit;
     } else {
@@ -142,15 +141,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="form-group">
                         <label>Client Name</label>
                         <input type="text" name="client" placeholder="e.g., Corporate Synergy Bhd" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select name="status">
-                            <option value="">Select Status</option>
-                            <option value="0">Ongoing</option>
-                            <option value="1">Completed</option>
-                        </select>
                     </div>
 
 

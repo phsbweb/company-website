@@ -155,7 +155,6 @@ try {
                         <th>#</th>
                         <th>Project Title</th>
                         <th>Client</th>
-                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -166,13 +165,6 @@ try {
                                 <td><?php echo htmlspecialchars($project['id']); ?></td>
                                 <td style="font-weight: 600;"><?php echo htmlspecialchars($project['title']); ?></td>
                                 <td><?php echo htmlspecialchars($project['client']); ?></td>
-                                <td>
-                                    <?php if ($project['status'] == 1): ?>
-                                        <span class="status-badge status-completed">Completed</span>
-                                    <?php else: ?>
-                                        <span class="status-badge status-ongoing">Ongoing</span>
-                                    <?php endif; ?>
-                                </td>
                                 <td>
                                     <div class="action-btns">
                                         <a href="edit-project.php?id=<?php echo $project['id']; ?>" class="action-btn btn-edit"><i class="fas fa-edit"></i></a>

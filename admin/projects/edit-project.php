@@ -21,7 +21,6 @@ if (!$project) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'] ?? '';
     $client = $_POST['client'] ?? '';
-    $status = isset($_POST['status']) && $_POST['status'] !== '' ? (int)$_POST['status'] : null;
 
 
     // Handle Image Upload
@@ -44,8 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    $stmt = $pdo->prepare("UPDATE projects SET title = ?, client = ?, status = ?, image_path = ? WHERE id = ?");
-    if ($stmt->execute([$title, $client, $status, $image_path, $id])) {
+    $stmt = $pdo->prepare("UPDATE projects SET title = ?, client = ?, image_path = ? WHERE id = ?");
+    if ($stmt->execute([$title, $client, $image_path, $id])) {
         header('Location: projects.php?msg=updated');
         exit;
     } else {
@@ -168,15 +167,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="form-group">
                         <label>Client Name</label>
                         <input type="text" name="client" value="<?php echo htmlspecialchars($project['client']); ?>" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select name="status">
-                            <option value="">Select Status</option>
-                            <option value="0" <?php echo ($project['status'] !== null && $project['status'] == 0) ? 'selected' : ''; ?>>Ongoing</option>
-                            <option value="1" <?php echo ($project['status'] !== null && $project['status'] == 1) ? 'selected' : ''; ?>>Completed</option>
-                        </select>
                     </div>
 
 
