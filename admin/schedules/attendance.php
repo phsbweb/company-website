@@ -460,7 +460,7 @@ try {
                                     <div style="font-weight: 500;"><?php echo date('h:i A', strtotime($row['check_in'])); ?></div>
                                     <div style="font-size: 0.75rem; color: #737373;"><?php echo date('d M Y', strtotime($row['check_in'])); ?></div>
                                     <?php if (($row['is_late'] ?? 0) == 1): ?>
-                                        <span class="late-badge">Late Check-in</span>
+                                        <span class="late-badge">Late</span>
                                     <?php endif; ?>
                                 </td>
                                 <td>

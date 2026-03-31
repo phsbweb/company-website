@@ -9,11 +9,11 @@ $attendanceCount = 0;
 try {
     $projectsCount = $pdo->query("SELECT COUNT(*) FROM projects")->fetchColumn();
 
-    // Connect to attendance DB for daily stats
-    $att_host = 'localhost';
-    $att_db   = 'phsb';
-    $att_user = 'root';
-    $att_pass = '';
+    // Connect to attendance DB for daily stats using environment variables
+    $att_host = getenv('DB_HOST') ?: 'localhost';
+    $att_db   = getenv('DB_NAME_ATTENDANCE') ?: 'phsb_erp';
+    $att_user = getenv('DB_USER') ?: 'root';
+    $att_pass = getenv('DB_PASS') ?: '';
     $att_dsn = "mysql:host=$att_host;dbname=$att_db;charset=utf8mb4";
     $att_pdo = new PDO($att_dsn, $att_user, $att_pass, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,

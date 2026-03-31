@@ -69,11 +69,11 @@ $events_json = json_encode($events);
     <style>
         .calendar-container {
             background: #ffffff;
-            padding: 30px;
+            padding: 20px;
             border-radius: 12px;
             border: 1px solid var(--border-color);
-            margin-top: 20px;
-            min-height: 800px;
+            margin: 20px auto;
+            max-width: 900px;
         }
 
         /* Customizing FullCalendar to match the PHSB aesthetic */
@@ -85,8 +85,14 @@ $events_json = json_encode($events);
             --fc-button-text-color: #525252;
             --fc-button-active-text-color: #ffffff;
             --fc-border-color: var(--border-color);
-            --fc-today-bg-color: #f8fafc;
+            --fc-today-bg-color: #f0f9ff;
             font-family: 'Inter', sans-serif;
+        }
+
+        .fc .fc-day-today {
+            background-color: var(--fc-today-bg-color) !important;
+            border: 2px solid #3b82f6 !important;
+            position: relative;
         }
 
         .fc .fc-toolbar-title {
@@ -220,6 +226,7 @@ $events_json = json_encode($events);
             var calendarEl = document.getElementById('calendar');
             var calendar = new FullCalendar.Calendar(calendarEl, {
                 initialView: 'dayGridMonth',
+                height: 550,
                 headerToolbar: {
                     left: 'prev,next today',
                     center: 'title',

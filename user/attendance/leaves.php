@@ -256,6 +256,9 @@ $leaves = $stmt->fetchAll();
             font-size: 0.75rem;
             font-weight: 700;
             text-transform: uppercase;
+            display: inline-block;
+            min-width: 80px;
+            text-align: center;
         }
 
         .status-pending {
@@ -302,6 +305,10 @@ $leaves = $stmt->fetchAll();
             transition: all 0.2s;
             text-transform: uppercase;
             letter-spacing: 0.02em;
+            display: inline-block;
+            min-width: 80px;
+            text-align: center;
+            margin-top: 5px;
         }
 
         .btn-cancel:hover {

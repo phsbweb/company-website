@@ -33,12 +33,81 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     }
 }
 
-// Fetch all leave requests with employee details
+// Get filters from URL
+$search = $_GET['search'] ?? '';
+$month = $_GET['month'] ?? '';
+$year = $_GET['year'] ?? '';
+$active_tab = $_GET['tab'] ?? 'pending';
+
+// Build Query with Filters
 $query = "SELECT l.*, e.full_name, e.username 
           FROM leaves l 
           JOIN employees e ON l.employee_id = e.id 
-          ORDER BY (l.status = 'pending') DESC, l.created_at DESC";
-$leaves = $pdo->query($query)->fetchAll();
+          WHERE 1=1";
+$params = [];
+
+if (!empty($search)) {
+    $query .= " AND (e.full_name LIKE ? OR e.username LIKE ?)";
+    $params[] = "%$search%";
+    $params[] = "%$search%";
+}
+
+if (!empty($month) && $month !== 'all') {
+    $query .= " AND MONTH(l.start_date) = ?";
+    $params[] = $month;
+}
+
+if (!empty($year) && $year !== 'all') {
+    $query .= " AND YEAR(l.start_date) = ?";
+    $params[] = $year;
+}
+
+$query .= " ORDER BY l.created_at DESC";
+$stmt = $pdo->prepare($query);
+$stmt->execute($params);
+$all_leaves = $stmt->fetchAll();
+
+// Categorize leaves
+$ongoing = [];
+$pending = [];
+$approved = [];
+$rejected = [];
+$cancelled = [];
+$today = date('Y-m-d');
+
+foreach ($all_leaves as $leave) {
+    // Normalize status for comparison
+    $status = trim(strtolower($leave['status']));
+    if ($status === '') $status = 'cancelled'; // Map blank to cancelled per user
+    
+    $endTime = !empty($leave['end_date']) ? strtotime($leave['end_date']) : 0;
+    $todayTime = strtotime($today);
+
+    if ($status === 'approved' && $todayTime <= $endTime) {
+        $ongoing[] = $leave;
+    } elseif ($status === 'pending') {
+        $pending[] = $leave;
+    } elseif ($status === 'approved' && $todayTime > $endTime) {
+        $approved[] = $leave;
+    } elseif ($status === 'rejected') {
+        $rejected[] = $leave;
+    } elseif ($status === 'cancelled') {
+        $cancelled[] = $leave;
+    }
+}
+
+// Map sections for the view
+$sections = [
+    'ongoing' => ['title' => 'Ongoing', 'items' => $ongoing, 'label' => 'Ongoing'],
+    'pending' => ['title' => 'Pending Requests', 'items' => $pending, 'label' => 'Pending'],
+    'approved' => ['title' => 'Approved History', 'items' => $approved, 'label' => 'Approved'],
+    'rejected' => ['title' => 'Rejected Requests', 'items' => $rejected, 'label' => 'Rejected'],
+    'cancelled' => ['title' => 'Cancelled', 'items' => $cancelled, 'label' => 'Cancelled']
+];
+
+if (!isset($sections[$active_tab])) {
+    $active_tab = 'pending';
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -77,6 +146,9 @@ $leaves = $pdo->query($query)->fetchAll();
             font-size: 0.75rem;
             font-weight: 700;
             text-transform: uppercase;
+            display: inline-block;
+            min-width: 80px;
+            text-align: center;
         }
 
         .status-pending {
@@ -145,6 +217,113 @@ $leaves = $pdo->query($query)->fetchAll();
             font-size: 0.85rem;
             color: #4b5563;
         }
+
+        .section-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 40px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f5f9;
+        }
+
+        .section-header h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .section-count {
+            background: #f1f5f9;
+            color: #64748b;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+        }
+
+        .ongoing-section h2 { color: #2563eb; }
+        .pending-section h2 { color: #d97706; }
+        .approved-section h2 { color: #059669; }
+        .rejected-section h2 { color: #dc2626; }
+        .cancelled-section h2 { color: #64748b; }
+
+        /* Multi-tab UI */
+        .tab-nav {
+            display: flex;
+            gap: 8px;
+            margin: 25px 0;
+            border-bottom: 1px solid #e2e8f0;
+            overflow-x: auto;
+            padding-bottom: 2px;
+        }
+
+        .tab-link {
+            padding: 10px 20px;
+            text-decoration: none;
+            color: #64748b;
+            font-weight: 700;
+            font-size: 0.9rem;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-link:hover {
+            color: var(--accent-color);
+        }
+
+        .tab-link.active {
+            color: var(--accent-color);
+            border-bottom-color: var(--accent-color);
+        }
+
+        .tab-count {
+            background: #f1f5f9;
+            color: #64748b;
+            padding: 2px 8px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+
+        .tab-link.active .tab-count {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+
+        /* Filter Bar */
+        .filter-bar {
+            display: flex;
+            gap: 15px;
+            background: #f8fafc;
+            padding: 15px;
+            border-radius: 12px;
+            margin-top: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .filter-input {
+            padding: 8px 12px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .filter-input:focus {
+            border-color: var(--accent-color);
+        }
     </style>
 </head>
 
@@ -170,14 +349,58 @@ $leaves = $pdo->query($query)->fetchAll();
             <div class="alert alert-error"><i class="fas fa-exclamation-circle"></i> <?php echo $error; ?></div>
         <?php endif; ?>
 
-        <div style="margin-top: 20px;">
-            <?php if (empty($leaves)): ?>
+        <form action="leaves.php" method="GET" class="filter-bar">
+            <input type="hidden" name="tab" value="<?php echo $active_tab; ?>">
+            <div class="filter-group" style="flex: 1; min-width: 200px;">
+                <i class="fas fa-search" style="color: #94a3b8;"></i>
+                <input type="text" name="search" class="filter-input" placeholder="Search employee..." value="<?php echo htmlspecialchars($search); ?>" style="width: 100%;">
+            </div>
+            <div class="filter-group">
+                <select name="month" class="filter-input">
+                    <option value="all">All Months</option>
+                    <?php for ($m = 1; $m <= 12; $m++): ?>
+                        <option value="<?php echo $m; ?>" <?php echo $month == $m ? 'selected' : ''; ?>>
+                            <?php echo date('F', mktime(0, 0, 0, $m, 1)); ?>
+                        </option>
+                    <?php endfor; ?>
+                </select>
+            </div>
+            <div class="filter-group">
+                <select name="year" class="filter-input">
+                    <option value="all">All Years</option>
+                    <?php 
+                    $currentYear = date('Y');
+                    for ($y = $currentYear; $y >= $currentYear - 2; $y--): ?>
+                        <option value="<?php echo $y; ?>" <?php echo $year == $y ? 'selected' : ''; ?>><?php echo $y; ?></option>
+                    <?php endfor; ?>
+                </select>
+            </div>
+            <button type="submit" class="btn-action" style="background: var(--accent-color); color: white;">Filter</button>
+            <?php if (!empty($search) || !empty($month) || !empty($year)): ?>
+                <a href="leaves.php?tab=<?php echo $active_tab; ?>" class="btn-action" style="background: #f1f5f9; color: #64748b; text-decoration: none;">Clear</a>
+            <?php endif; ?>
+        </form>
+
+        <div class="tab-nav">
+            <?php foreach ($sections as $key => $section): ?>
+                <a href="leaves.php?tab=<?php echo $key; ?>&search=<?php echo urlencode($search); ?>&month=<?php echo $month; ?>&year=<?php echo $year; ?>" 
+                   class="tab-link <?php echo $active_tab === $key ? 'active' : ''; ?>">
+                    <?php echo $section['label']; ?>
+                    <span class="tab-count"><?php echo count($section['items']); ?></span>
+                </a>
+            <?php endforeach; ?>
+        </div>
+
+        <div style="margin-top: 10px;">
+            <?php 
+            $current_section = $sections[$active_tab];
+            if (empty($current_section['items'])): ?>
                 <div class="admin-card" style="text-align: center; padding: 60px;">
                     <i class="fas fa-calendar-check" style="font-size: 3rem; opacity: 0.2; margin-bottom: 15px;"></i>
-                    <p style="color: #666;">No leave requests found.</p>
+                    <p style="color: #666;">No <?php echo strtolower($current_section['label']); ?> leaves found for this filter.</p>
                 </div>
             <?php else: ?>
-                <?php foreach ($leaves as $leave): ?>
+                <?php foreach ($current_section['items'] as $leave): ?>
                     <div class="leave-card">
                         <div style="width: 50px; height: 50px; background: #f1f5f9; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--accent-color); font-weight: 800; font-size: 1.2rem;">
                             <?php echo strtoupper(substr($leave['full_name'], 0, 1)); ?>
@@ -215,11 +438,11 @@ $leaves = $pdo->query($query)->fetchAll();
                         </div>
                         <div style="text-align: right;">
                             <div style="margin-bottom: 10px;">
-                                <span class="status-badge status-<?php echo $leave['status']; ?>">
-                                    <?php echo $leave['status']; ?>
+                                <span class="status-badge status-<?php echo $leave['status'] ?: 'cancelled'; ?>">
+                                    <?php echo $leave['status'] ?: 'cancelled'; ?>
                                 </span>
                             </div>
-                            <?php if ($leave['status'] === 'pending'): ?>
+                            <?php if (($leave['status'] === 'pending' || $leave['status'] === '')): ?>
                                 <div class="action-btns">
                                     <form action="leaves.php" method="POST" onsubmit="return confirm('Approve this leave request?');">
                                         <input type="hidden" name="action" value="approve">

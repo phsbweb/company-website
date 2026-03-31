@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../../../env_loader.php';
 
 $host = getenv('DB_HOST') ?: 'localhost';
-$db   = getenv('DB_NAME') ?: 'phsb_web';
+$db   = getenv('DB_NAME_MAIN') ?: 'phsb_web';
 $user = getenv('DB_USER') ?: 'root';
 $pass = getenv('DB_PASS') ?: '';
 $charset = getenv('DB_CHARSET') ?: 'utf8mb4';

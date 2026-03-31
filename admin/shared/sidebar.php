@@ -23,7 +23,7 @@ $pending_count = $stmt_pending->fetchColumn();
                 <i class="fas fa-th-large"></i> Dashboard
             </a>
         </li>
-        <li class="has-dropdown <?php echo ($activePage == 'employees' || $activePage == 'departments' || $activePage == 'create-admin') ? 'active open' : ''; ?>">
+        <li class="has-dropdown <?php echo ($activePage == 'employees' || $activePage == 'departments') ? 'active open' : ''; ?>">
             <a href="javascript:void(0)" class="dropdown-toggle">
                 <i class="fas fa-users"></i> Employees
                 <i class="fas fa-chevron-right chevron"></i>
@@ -37,11 +37,6 @@ $pending_count = $stmt_pending->fetchColumn();
                 <li>
                     <a href="<?php echo $baseUrl; ?>employees/departments.php" class="<?php echo ($activePage == 'departments') ? 'active' : ''; ?>">
                         Departments
-                    </a>
-                </li>
-                <li>
-                    <a href="<?php echo $baseUrl; ?>employees/create-admin.php" class="<?php echo ($activePage == 'create-admin') ? 'active' : ''; ?>">
-                        Create Admin
                     </a>
                 </li>
             </ul>

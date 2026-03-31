@@ -3,7 +3,7 @@ require_once __DIR__ . '/../../env_loader.php';
 
 date_default_timezone_set('Asia/Kuala_Lumpur');
 $host = getenv('DB_HOST') ?: 'localhost';
-$db   = getenv('DB_NAME') ?: 'phsb';
+$db   = getenv('DB_NAME_ATTENDANCE') ?: 'phsb_erp';
 $user = getenv('DB_USER') ?: 'root';
 $pass = getenv('DB_PASS') ?: '';
 $charset = getenv('DB_CHARSET') ?: 'utf8mb4';
