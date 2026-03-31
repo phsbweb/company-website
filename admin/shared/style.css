@@ -35,11 +35,50 @@ body {
     z-index: 100;
 }
 
+.sidebar-logo-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding: 0 10px;
+}
+
 .sidebar-logo {
     font-size: 1.1rem;
     font-weight: 800;
-    margin-bottom: 30px;
-    padding: 0 10px;
+}
+
+.notification-bell {
+    position: relative;
+    color: #737373;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.notification-bell:hover {
+    color: var(--accent-color);
+}
+
+.bell-dot {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    width: 6px;
+    height: 6px;
+    background: #ef4444;
+    border-radius: 50%;
+    border: 1.5px solid #ffffff;
+}
+
+.sidebar-badge {
+    background: #ef4444;
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 10px;
+    line-height: 1;
 }
 
 .nav-links {

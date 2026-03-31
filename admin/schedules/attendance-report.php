@@ -7,7 +7,7 @@ $employee_id = isset($_GET['employee_id']) ? (int)$_GET['employee_id'] : null;
 $selected_month = isset($_GET['month']) ? $_GET['month'] : date('Y-m');
 
 if (!$employee_id) {
-    header('Location: employees.php');
+    header('Location: ../employees/employees.php');
     exit;
 }
 
@@ -17,7 +17,7 @@ $stmt->execute([$employee_id]);
 $employee = $stmt->fetch();
 
 if (!$employee) {
-    header('Location: employees.php');
+    header('Location: ../employees/employees.php');
     exit;
 }
 

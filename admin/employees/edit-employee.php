@@ -54,6 +54,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     $stmt->execute([$full_name, $username, $shift, $department_id, $id]);
                 }
 
+                // Log Change
+                require_once '../shared/logger.php';
+                logAction($pdo, $_SESSION['admin_user_id'], $_SESSION['admin_username'], 'Edit Employee', 'Employee', $id, "Updated details for $full_name ($username)");
+
                 $_SESSION['success_msg'] = "Employee updated successfully.";
                 header("Location: employees.php");
                 exit;

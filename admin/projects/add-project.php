@@ -5,9 +5,6 @@ include '../../user/profile_page/includes/db.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'] ?? '';
     $client = $_POST['client'] ?? '';
-    $completion_month = !empty($_POST['completion_month']) ? (int)$_POST['completion_month'] : null;
-    $completion_year = !empty($_POST['completion_year']) ? (int)$_POST['completion_year'] : null;
-    $status = isset($_POST['status']) && $_POST['status'] !== '' ? (int)$_POST['status'] : null;
 
 
     // Handle Image Upload
@@ -26,8 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    $stmt = $pdo->prepare("INSERT INTO projects (title, client, completion_year, completion_month, status, image_path) VALUES (?, ?, ?, ?, ?, ?)");
-    if ($stmt->execute([$title, $client, $completion_year, $completion_month, $status, $image_path])) {
+    $stmt = $pdo->prepare("INSERT INTO projects (title, client, image_path) VALUES (?, ?, ?)");
+    if ($stmt->execute([$title, $client, $image_path])) {
         header('Location: projects.php?msg=added');
         exit;
     } else {
@@ -144,39 +141,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="form-group">
                         <label>Client Name</label>
                         <input type="text" name="client" placeholder="e.g., Corporate Synergy Bhd" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Completion Month</label>
-                        <select name="completion_month">
-                            <option value="">Select Month</option>
-                            <?php
-                            $months = [1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'May', 6 => 'Jun', 7 => 'Jul', 8 => 'Aug', 9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dec'];
-                            foreach ($months as $num => $month) echo "<option value='$num'>$month</option>";
-                            ?>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Completion Year</label>
-                        <select name="completion_year">
-                            <option value="">Select Year</option>
-                            <?php
-                            $currentYear = date('Y');
-                            for ($y = 2012; $y <= $currentYear + 20; $y++) {
-                                echo "<option value='$y'>$y</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select name="status">
-                            <option value="">Select Status</option>
-                            <option value="0">Ongoing</option>
-                            <option value="1">Completed</option>
-                        </select>
                     </div>
 
 

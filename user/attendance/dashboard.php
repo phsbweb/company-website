@@ -25,14 +25,26 @@ if ($current_status && $current_status['status'] === 'checked_in') {
         $update = $pdo->prepare("UPDATE attendance SET check_out = ?, status = 'checked_out', location_out = 'Auto-Checkout (System)' WHERE id = ?");
         $update->execute([$auto_checkout, $current_status['id']]);
 
-        // Refresh status after fix
-        $isCheckedIn = false;
+        // Auto Logout: Clear device token and destroy session
+        if (isset($_COOKIE['device_token'])) {
+            $stmt = $pdo->prepare("DELETE FROM device_tokens WHERE token = ?");
+            $stmt->execute([$_COOKIE['device_token']]);
+            setcookie('device_token', '', time() - 3600, '/');
+        }
+
+        session_destroy();
+        header("Location: index.php?trace=auto_logout");
+        exit;
     } else {
         $isCheckedIn = true;
     }
 } else {
     $isCheckedIn = false;
 }
+
+// Prepare shift data for reminders
+$shift_start = ($current_status['working_shift'] === '830-530') ? "08:30" : "08:00";
+$shift_end = ($current_status['working_shift'] === '830-530') ? "17:30" : "17:00";
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -42,6 +54,20 @@ if ($current_status && $current_status['status'] === 'checked_in') {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Attendance System</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .late-badge {
+            background: #fef2f2;
+            color: #991b1b;
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            margin-left: 8px;
+            border: 1px solid #fee2e2;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+    </style>
 </head>
 
 <body>
@@ -67,10 +93,14 @@ if ($current_status && $current_status['status'] === 'checked_in') {
         <div class="nav-tabs" style="display: flex; gap: 10px; margin-bottom: 2rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 0.5rem;">
             <a href="dashboard.php" class="nav-tab active" style="padding: 0.5rem 1rem; text-decoration: none; color: var(--primary-color); font-weight: 500; border-radius: 6px; background: #f1f5f9;">Attendance</a>
             <a href="leaves.php" class="nav-tab" style="padding: 0.5rem 1rem; text-decoration: none; color: #64748b; font-weight: 500; border-radius: 6px; transition: all 0.2s;">Leave Requests</a>
+            <a href="directory.php" class="nav-tab" style="padding: 0.5rem 1rem; text-decoration: none; color: #64748b; font-weight: 500; border-radius: 6px; transition: all 0.2s;">Directory</a>
         </div>
 
         <div class="status-badge <?php echo $isCheckedIn ? 'status-checked-in' : 'status-checked-out'; ?>" id="status-badge">
             Status: <?php echo $isCheckedIn ? 'Checked In' : 'Checked Out'; ?>
+            <?php if ($isCheckedIn && ($current_status['is_late'] ?? 0) == 1): ?>
+                <span class="late-badge">Late</span>
+            <?php endif; ?>
         </div>
 
         <div>
@@ -101,7 +131,16 @@ if ($current_status && $current_status['status'] === 'checked_in') {
         </div>
     </div>
 
+    <script>
+        window.attendanceData = {
+            isCheckedIn: <?php echo $isCheckedIn ? 'true' : 'false'; ?>,
+            shiftStart: "<?php echo $shift_start; ?>",
+            shiftEnd: "<?php echo $shift_end; ?>",
+            userId: <?php echo $_SESSION['user_id']; ?>
+        };
+    </script>
     <script src="script.js"></script>
+    <script src="reminders.js"></script>
 </body>
 
 </html>

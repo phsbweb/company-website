@@ -21,9 +21,6 @@ if (!$project) {
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'] ?? '';
     $client = $_POST['client'] ?? '';
-    $completion_month = !empty($_POST['completion_month']) ? (int)$_POST['completion_month'] : null;
-    $completion_year = !empty($_POST['completion_year']) ? (int)$_POST['completion_year'] : null;
-    $status = isset($_POST['status']) && $_POST['status'] !== '' ? (int)$_POST['status'] : null;
 
 
     // Handle Image Upload
@@ -46,8 +43,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    $stmt = $pdo->prepare("UPDATE projects SET title = ?, client = ?, completion_year = ?, completion_month = ?, status = ?, image_path = ? WHERE id = ?");
-    if ($stmt->execute([$title, $client, $completion_year, $completion_month, $status, $image_path, $id])) {
+    $stmt = $pdo->prepare("UPDATE projects SET title = ?, client = ?, image_path = ? WHERE id = ?");
+    if ($stmt->execute([$title, $client, $image_path, $id])) {
         header('Location: projects.php?msg=updated');
         exit;
     } else {
@@ -170,43 +167,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <div class="form-group">
                         <label>Client Name</label>
                         <input type="text" name="client" value="<?php echo htmlspecialchars($project['client']); ?>" required>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Completion Month</label>
-                        <select name="completion_month">
-                            <option value="">Select Month</option>
-                            <?php
-                            $months = [1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'May', 6 => 'Jun', 7 => 'Jul', 8 => 'Aug', 9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dec'];
-                            foreach ($months as $num => $month) {
-                                $selected = ($project['completion_month'] == $num && $project['completion_month'] !== null) ? 'selected' : '';
-                                echo "<option value='$num' $selected>$month</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Completion Year</label>
-                        <select name="completion_year">
-                            <option value="">Select Year</option>
-                            <?php
-                            $currentYear = date('Y') ?: 2024;
-                            for ($y = 2012; $y <= $currentYear + 20; $y++) {
-                                $selected = ($project['completion_year'] == $y && $project['completion_year'] !== null) ? 'selected' : '';
-                                echo "<option value='$y' $selected>$y</option>";
-                            }
-                            ?>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label>Status</label>
-                        <select name="status">
-                            <option value="">Select Status</option>
-                            <option value="0" <?php echo ($project['status'] !== null && $project['status'] == 0) ? 'selected' : ''; ?>>Ongoing</option>
-                            <option value="1" <?php echo ($project['status'] !== null && $project['status'] == 1) ? 'selected' : ''; ?>>Completed</option>
-                        </select>
                     </div>
 
 

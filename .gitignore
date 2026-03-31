@@ -1,0 +1,18 @@
+# Environment variables
+.env
+
+# OS files
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# XAMPP/Logs
+*.log
+tmp/
+temp/
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace

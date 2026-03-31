@@ -32,6 +32,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
                     $update = $pdo->prepare("UPDATE attendance SET check_out = ?, status = 'checked_out', location_out = 'Auto-Checkout (System)' WHERE id = ?");
                     $update->execute([$auto_checkout, $last_record['id']]);
+
+                    // Auto Logout: Clear device token and destroy session
+                    if (isset($_COOKIE['device_token'])) {
+                        $stmt = $pdo->prepare("DELETE FROM device_tokens WHERE token = ?");
+                        $stmt->execute([$_COOKIE['device_token']]);
+                        setcookie('device_token', '', time() - 3600, '/');
+                    }
+                    session_destroy();
+                    echo json_encode(['success' => false, 'redirect' => 'index.php?trace=auto_logout', 'message' => 'Session expired. Please login again.']);
+                    exit;
                 } else {
                     echo json_encode(['success' => false, 'message' => 'Already checked in']);
                     exit;
@@ -39,8 +49,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             }
 
             $location = $_POST['location'] ?? 'Unknown';
-            $stmt = $pdo->prepare("INSERT INTO attendance (employee_id, check_in, location_in, status) VALUES (?, ?, ?, 'checked_in')");
-            $stmt->execute([$employee_id, $now, $location]);
+            
+            // Calculate if late (15 min grace period)
+            $is_late = 0;
+            $shift_info = $pdo->prepare("SELECT working_shift FROM employees WHERE id = ?");
+            $shift_info->execute([$employee_id]);
+            $emp_shift = $shift_info->fetchColumn();
+            
+            $start_time_str = ($emp_shift === '830-530') ? "08:30:00" : "08:00:00";
+            $grace_minutes = 15;
+            $shift_start_timestamp = strtotime(date('Y-m-d ') . $start_time_str);
+            $late_threshold = $shift_start_timestamp + ($grace_minutes * 60);
+            
+            if (strtotime($now) > $late_threshold) {
+                $is_late = 1;
+            }
+
+            $stmt = $pdo->prepare("INSERT INTO attendance (employee_id, check_in, location_in, status, is_late) VALUES (?, ?, ?, 'checked_in', ?)");
+            $stmt->execute([$employee_id, $now, $location, $is_late]);
             echo json_encode(['success' => true]);
             exit;
         }

@@ -5,9 +5,6 @@ include '../../user/profile_page/includes/db.php';
 $projects = [];
 $error = false;
 
-// Month mapping for display
-$months = [1 => 'Jan', 2 => 'Feb', 3 => 'Mar', 4 => 'Apr', 5 => 'May', 6 => 'Jun', 7 => 'Jul', 8 => 'Aug', 9 => 'Sep', 10 => 'Oct', 11 => 'Nov', 12 => 'Dec'];
-
 // Fetch projects from database with error handling
 try {
     $stmt = $pdo->query("SELECT * FROM projects ORDER BY id DESC");
@@ -158,8 +155,6 @@ try {
                         <th>#</th>
                         <th>Project Title</th>
                         <th>Client</th>
-                        <th>Completion</th>
-                        <th>Status</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -170,14 +165,6 @@ try {
                                 <td><?php echo htmlspecialchars($project['id']); ?></td>
                                 <td style="font-weight: 600;"><?php echo htmlspecialchars($project['title']); ?></td>
                                 <td><?php echo htmlspecialchars($project['client']); ?></td>
-                                <td><?php echo htmlspecialchars(($months[$project['completion_month']] ?? '') . ' ' . $project['completion_year']); ?></td>
-                                <td>
-                                    <?php if ($project['status'] == 1): ?>
-                                        <span class="status-badge status-completed">Completed</span>
-                                    <?php else: ?>
-                                        <span class="status-badge status-ongoing">Ongoing</span>
-                                    <?php endif; ?>
-                                </td>
                                 <td>
                                     <div class="action-btns">
                                         <a href="edit-project.php?id=<?php echo $project['id']; ?>" class="action-btn btn-edit"><i class="fas fa-edit"></i></a>
