@@ -1,4 +1,5 @@
 {
+  "_comment": "Triggering fresh build",
   "version": 2,
   "functions": {
     "admin/**/*.php": { "runtime": "vercel-php@0.7.2" },
