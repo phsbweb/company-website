@@ -18,5 +18,5 @@ $options = [
 try {
     $pdo = new PDO($dsn, $user, $pass, $options);
 } catch (\PDOException $e) {
-    throw new \PDOException($e->getMessage(), (int)$e->getCode());
+    throw new \PDOException("Connection failed to host '$host' on port '$port': " . $e->getMessage(), (int)$e->getCode());
 }
