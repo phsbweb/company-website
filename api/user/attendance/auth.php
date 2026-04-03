@@ -7,21 +7,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
     if ($_POST['action'] === 'login') {
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
+        
+        log_debug($pdo, 'AUTH', "Login attempt started for user: $username");
 
         $stmt = $pdo->prepare("SELECT * FROM employees WHERE username = ?");
         $stmt->execute([$username]);
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password'])) {
-            // Punch Buddy Protection: Check if already signed in on another device
+            log_debug($pdo, 'AUTH', "Password verified for user ID: " . $user['id'], $user['id']);
+            
+            // Punch Buddy Protection check
             $stmt = $pdo->prepare("SELECT id, user_agent FROM device_tokens WHERE employee_id = ?");
             $stmt->execute([$user['id']]);
             $existing_token = $stmt->fetch();
             
             if ($existing_token) {
-                // If the user agent is exactly the same, we assume it's a re-login on the same device (e.g. cleared cookies)
-                // If it's DIFFERENT, we block it to prevent punch buddies.
                 if ($existing_token['user_agent'] !== $_SERVER['HTTP_USER_AGENT']) {
+                    log_debug($pdo, 'AUTH', "BLOCKED: Device mismatch. Existing: " . $existing_token['user_agent'], $user['id']);
                     $_SESSION['error'] = "already_signed_in";
                     session_write_close();
                     header("Location: index.php");
@@ -42,12 +45,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $stmt->execute([$user['id'], $token, $user_agent]);
 
             // Set cookie for 30 days
-            setcookie('device_token', $token, time() + (86400 * 30), "/", "", false, true);
+            $cookie_set = setcookie('device_token', $token, time() + (86400 * 30), "/", "", false, true);
+            log_debug($pdo, 'AUTH', "Cookie set attempt result: " . ($cookie_set ? 'Success' : 'Fail'), $user['id']);
 
             session_write_close();
+            log_debug($pdo, 'AUTH', "Redirecting to dashboard...", $user['id']);
             header("Location: dashboard.php");
             exit;
         } else {
+            log_debug($pdo, 'AUTH', "Login FAILED: Incorrect password or user not found.");
             $_SESSION['error'] = "Invalid username or password.";
             session_write_close();
             header("Location: index.php?trace=login_failed");
