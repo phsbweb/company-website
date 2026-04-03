@@ -30,4 +30,4 @@ function loadEnv($path) {
 }
 
 // Load .env if it exists in the root directory
-loadEnv(__DIR__ . '/.env');
+loadEnv(__DIR__ . '/../.env');
