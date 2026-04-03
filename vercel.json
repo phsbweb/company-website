@@ -1,8 +1,15 @@
 {
   "version": 2,
   "functions": {
-    "admin/**/*.php": { "runtime": "vercel-php@0.7.2" },
-    "user/**/*.php": { "runtime": "vercel-php@0.7.2" },
-    "*.php": { "runtime": "vercel-php@0.7.2" }
-  }
+    "api/**/*.php": {
+      "runtime": "vercel-php@0.7.2"
+    }
+  },
+  "rewrites": [
+    { "src": "/admin/(.*)", "dest": "/api/admin/$1" },
+    { "src": "/user/(.*)", "dest": "/api/user/$1" },
+    { "src": "/database/(.*)", "dest": "/api/database/$1" },
+    { "src": "/", "dest": "/api/index.php" },
+    { "src": "/(.*)", "dest": "/api/$1" }
+  ]
 }

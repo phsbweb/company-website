@@ -31,7 +31,7 @@ Since we don't have a live staging server, you must test the `development` branc
     ```bash
     git pull origin development
     ```
-5.  Open your browser and navigate to `http://localhost/phsb`.
+5.  Open your browser and navigate to **`http://localhost/phsb/api`**.
 6.  _Test the website features thoroughly._
 
 ### **How to Push Your Changes Up:**
@@ -65,7 +65,7 @@ For your local development to work correctly, you'll need the matching database 
 
 1.  Open **phpMyAdmin** (`http://localhost/phpmyadmin`).
 2.  Create a new database named **`phsb_erp`** and another named **`phsb_web`**.
-3.  Go to the **`/database`** folder in this repository.
+3.  Go to the **`/api/database`** folder in this repository.
 4.  Import **`phsb_erp.sql`** into the `phsb_erp` database and **`phsb_web.sql`** into the `phsb_web` database. 
 5.  **Default Admin Logins**:
     *   **Admin Panel Username**: `phsb_adm` (Password: `admin123`)
