@@ -11,10 +11,11 @@ try {
 
     // Connect to attendance DB for daily stats using environment variables
     $att_host = getenv('DB_HOST') ?: 'localhost';
+    $att_port = getenv('DB_PORT') ?: '10624';
     $att_db   = getenv('DB_NAME_ATTENDANCE') ?: 'phsb_erp';
     $att_user = getenv('DB_USER') ?: 'root';
     $att_pass = getenv('DB_PASS') ?: '';
-    $att_dsn = "mysql:host=$att_host;dbname=$att_db;charset=utf8mb4";
+    $att_dsn = "mysql:host=$att_host;port=$att_port;dbname=$att_db;charset=utf8mb4";
     $att_pdo = new PDO($att_dsn, $att_user, $att_pass, [
         PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
