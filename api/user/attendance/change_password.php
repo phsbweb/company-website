@@ -1,8 +1,25 @@
-<?php
+session_set_cookie_params(['path' => '/', 'samesite' => 'Lax']);
 session_start();
 if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php");
-    exit;
+    // If no session, try to re-hydrate from cookie (Vercel/Serverless fix)
+    if (isset($_COOKIE['device_token'])) {
+        require_once 'db_connect.php';
+        $token = $_COOKIE['device_token'];
+        $stmt = $pdo->prepare("SELECT e.* FROM employees e JOIN device_tokens dt ON e.id = dt.employee_id WHERE dt.token = ?");
+        $stmt->execute([$token]);
+        $user = $stmt->fetch();
+
+        if ($user) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['full_name'] = $user['full_name'];
+        } else {
+            header("Location: index.php");
+            exit;
+        }
+    } else {
+        header("Location: index.php");
+        exit;
+    }
 }
 
 require_once 'db_connect.php';
