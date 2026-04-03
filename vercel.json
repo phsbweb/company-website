@@ -6,10 +6,10 @@
     }
   },
   "rewrites": [
-    { "src": "/admin/(.*)", "dest": "/api/admin/$1" },
-    { "src": "/user/(.*)", "dest": "/api/user/$1" },
-    { "src": "/database/(.*)", "dest": "/api/database/$1" },
-    { "src": "/", "dest": "/api/index.php" },
-    { "src": "/(.*)", "dest": "/api/$1" }
+    { "source": "/admin/(.*)", "destination": "/api/admin/$1" },
+    { "source": "/user/(.*)", "destination": "/api/user/$1" },
+    { "source": "/database/(.*)", "destination": "/api/database/$1" },
+    { "source": "/", "destination": "/api/index.php" },
+    { "source": "/(.*)", "destination": "/api/$1" }
   ]
 }
