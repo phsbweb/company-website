@@ -110,9 +110,9 @@ if (empty($projects)) {
             <?php if (count($projects) > 0): ?>
                 <?php foreach ($projects as $project): ?>
                     <div class="feature-panel project-panel" style="background-image: url('<?php 
-                        $img = !empty($project['image_path']) ? htmlspecialchars($project['image_path']) : '../../../user/profile_page/assets/images/cta-bg.webp'; 
+                        $img = !empty($project['image_path']) ? htmlspecialchars($project['image_path']) : '../../../assets/user/profile_page/assets/images/cta-bg.webp'; 
                         // If it's a relative path to assets, prefix it to reach the root
-                        if (strpos($img, 'assets/') === 0) { $img = '../../../user/profile_page/' . $img; }
+                        if (strpos($img, 'assets/') === 0) { $img = '../../../assets/user/profile_page/' . $img; }
                         echo $img; 
                     ?>'); background-size: cover; background-position: center; background-repeat: no-repeat;">
                         <div class="feature-content project-content">

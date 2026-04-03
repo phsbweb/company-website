@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Change Password - Attendance System</title>
-    <link rel="stylesheet" href="../../../user/attendance/style.css">
+    <link rel="stylesheet" href="../../../assets/user/attendance/style.css">
 </head>
 
 <body>
