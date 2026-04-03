@@ -11,7 +11,10 @@ try {
 
     // Connect to attendance DB for daily stats using environment variables
     $att_host = getenv('DB_HOST') ?: 'localhost';
-    $att_port = getenv('DB_PORT') ?: '10624';
+    $att_port = getenv('DB_PORT');
+    if (!$att_port) {
+        $att_port = ($att_host === 'localhost') ? '3306' : '10624';
+    }
     $att_db   = getenv('DB_NAME_ATTENDANCE') ?: 'phsb_erp';
     $att_user = getenv('DB_USER') ?: 'root';
     $att_pass = getenv('DB_PASS') ?: '';
@@ -44,7 +47,7 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Priority Horizon Admin</title>
-    <link rel="stylesheet" href="../shared/style.css">
+    <link rel="stylesheet" href="../../../admin/shared/style.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>

@@ -53,7 +53,7 @@ $shift_end = ($current_status['working_shift'] === '830-530') ? "17:30" : "17:00
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Attendance System</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="../../../user/attendance/style.css">
     <style>
         .late-badge {
             background: #fef2f2;
@@ -139,8 +139,8 @@ $shift_end = ($current_status['working_shift'] === '830-530') ? "17:30" : "17:00
             userId: <?php echo $_SESSION['user_id']; ?>
         };
     </script>
-    <script src="script.js"></script>
-    <script src="reminders.js"></script>
+    <script src="../../../user/attendance/script.js"></script>
+    <script src="../../../user/attendance/reminders.js"></script>
 </body>
 
 </html>
