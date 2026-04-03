@@ -32,6 +32,9 @@ if (empty($projects)) {
 }
 ?>
 
+<!-- Firefox Scroll-Snap Fix: Invisible anchor at the top of the viewport -->
+<div class="snap-section" style="position: absolute; top: 0; height: 1px; width: 1px; visibility: hidden;"></div>
+
 <!-- Hero Section -->
 <section class="hero snap-section">
     <div class="container">
