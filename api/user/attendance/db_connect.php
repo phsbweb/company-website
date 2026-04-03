@@ -3,7 +3,10 @@ require_once __DIR__ . '/../../env_loader.php';
 
 date_default_timezone_set('Asia/Kuala_Lumpur');
 $host = getenv('DB_HOST') ?: 'localhost';
-$port = getenv('DB_PORT') ?: '10624';
+$port = getenv('DB_PORT');
+if (!$port) {
+     $port = ($host === 'localhost') ? '3306' : '10624';
+}
 $db   = getenv('DB_NAME_ATTENDANCE') ?: 'phsb_erp';
 $user = getenv('DB_USER') ?: 'root';
 $pass = getenv('DB_PASS') ?: '';

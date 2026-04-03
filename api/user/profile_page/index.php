@@ -75,7 +75,7 @@ if (empty($projects)) {
 
         <div class="feature-panels">
             <!-- Feature 1 -->
-            <div class="feature-panel" style="background-image: url('assets/images/safety.webp');">
+            <div class="feature-panel" style="background-image: url('../../../user/profile_page/assets/images/safety.webp');">
                 <div class="feature-content">
                     <h3 class="panel-title">Safety First</h3>
                     <p class="panel-desc">We prioritize the safety of our team and clients in every project we undertake.</p>
@@ -83,7 +83,7 @@ if (empty($projects)) {
             </div>
 
             <!-- Feature 2 -->
-            <div class="feature-panel" style="background-image: url('assets/images/quality.webp');">
+            <div class="feature-panel" style="background-image: url('../../../user/profile_page/assets/images/quality.webp');">
                 <div class="feature-content">
                     <h3 class="panel-title">Quality Construction</h3>
                     <p class="panel-desc">Using the best materials and practices to ensure structural integrity and longevity.</p>
@@ -91,7 +91,7 @@ if (empty($projects)) {
             </div>
 
             <!-- Feature 3 -->
-            <div class="feature-panel" style="background-image: url('assets/images/delivery.webp');">
+            <div class="feature-panel" style="background-image: url('../../../user/profile_page/assets/images/delivery.webp');">
                 <div class="feature-content">
                     <h3 class="panel-title">Timely Delivery</h3>
                     <p class="panel-desc">Committed to completing projects on schedule without compromising on quality.</p>
@@ -109,7 +109,12 @@ if (empty($projects)) {
         <div class="feature-panels">
             <?php if (count($projects) > 0): ?>
                 <?php foreach ($projects as $project): ?>
-                    <div class="feature-panel project-panel" style="background-image: url('<?php echo !empty($project['image_path']) ? htmlspecialchars($project['image_path']) : 'assets/images/cta-bg.webp'; ?>'); background-size: cover; background-position: center; background-repeat: no-repeat;">
+                    <div class="feature-panel project-panel" style="background-image: url('<?php 
+                        $img = !empty($project['image_path']) ? htmlspecialchars($project['image_path']) : '../../../user/profile_page/assets/images/cta-bg.webp'; 
+                        // If it's a relative path to assets, prefix it to reach the root
+                        if (strpos($img, 'assets/') === 0) { $img = '../../../user/profile_page/' . $img; }
+                        echo $img; 
+                    ?>'); background-size: cover; background-position: center; background-repeat: no-repeat;">
                         <div class="feature-content project-content">
                             <h3 class="panel-title"><?php echo htmlspecialchars($project['title']); ?></h3>
                             <p class="panel-desc"><?php echo htmlspecialchars($project['client']); ?></p>

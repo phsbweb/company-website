@@ -113,7 +113,7 @@ if (!isset($sections[$active_tab])) {
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" href="../shared/style.css">
+    <link rel="stylesheet" href="../../../admin/shared/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .leave-card {

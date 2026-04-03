@@ -20,7 +20,7 @@ function isActive($page)
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 
     <!-- CSS -->
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="../../../user/profile_page/assets/css/style.css">
 
     <!-- Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
@@ -30,7 +30,7 @@ function isActive($page)
     <header>
         <div class="container">
             <nav>
-                <a href="index.php" class="logo"><img src="assets/images/PHSB logo.png" alt="Priority Horizon Logo" class="logo-img">Priority Horizon</a>
+                <a href="index.php" class="logo"><img src="../../../user/profile_page/assets/images/PHSB logo.png" alt="Priority Horizon Logo" class="logo-img">Priority Horizon</a>
 
                 <div class="menu-toggle" id="mobile-menu">
                     <i class="fas fa-bars"></i>

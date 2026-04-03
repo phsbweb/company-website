@@ -31,7 +31,7 @@ Since we don't have a live staging server, you must test the `development` branc
     ```bash
     git pull origin development
     ```
-5.  Open your browser and navigate to **`http://localhost/phsb/api`**.
+5.  Open your browser and navigate to **`http://localhost:8080/phsb/api`**.
 6.  _Test the website features thoroughly._
 
 ### **How to Push Your Changes Up:**
