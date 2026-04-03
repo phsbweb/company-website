@@ -1,4 +1,5 @@
 <?php
+session_set_cookie_params(['path' => '/', 'samesite' => 'Lax']);
 session_start();
 if (!isset($_SESSION['user_id'])) {
     header("Location: index.php?trace=no_session");

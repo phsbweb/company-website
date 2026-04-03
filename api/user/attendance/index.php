@@ -1,4 +1,5 @@
 <?php
+session_set_cookie_params(['path' => '/', 'samesite' => 'Lax']);
 session_start();
 // Debugging session
 // echo "Session ID: " . session_id() . "<br>";
@@ -41,6 +42,16 @@ unset($_SESSION['error']);
     <div class="container">
         <h1>PHSB Attendance</h1>
         <p style="margin-bottom: 2rem; color: #64748b;">Please login to your account</p>
+
+        <?php if (isset($_SESSION['error'])): ?>
+            <div style="background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; border: 1px solid #fecaca;">
+                <i class="fas fa-exclamation-circle"></i> 
+                <?php 
+                    echo htmlspecialchars($_SESSION['error']); 
+                    unset($_SESSION['error']); // Clear it after showing
+                ?>
+            </div>
+        <?php endif; ?>
 
         <?php if (isset($_GET['trace'])): ?>
             <?php if ($_GET['trace'] === 'auto_logout'): ?>

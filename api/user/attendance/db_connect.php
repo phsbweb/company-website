@@ -1,5 +1,7 @@
 <?php
+ob_start();
 require_once __DIR__ . '/../../env_loader.php';
+ob_end_clean();
 
 date_default_timezone_set('Asia/Kuala_Lumpur');
 $host = getenv('DB_HOST') ?: 'localhost';
