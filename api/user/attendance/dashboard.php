@@ -2,14 +2,14 @@
 session_set_cookie_params(['path' => '/', 'samesite' => 'Lax']);
 session_start();
 
-// DEBUG: Spy at the front door!
-if (isset($_GET['debug'])) {
-    echo "<pre>DEBUG FRONT DOOR:\n";
-    echo "SESSION:\n"; print_r($_SESSION);
-    echo "\nCOOKIES:\n"; print_r($_COOKIE);
-    echo "</pre>";
-    // exit; // Uncomment to stop here if needed
-}
+// THE TRUTH (No if-statement, no bypasses):
+echo "<pre>---------------- DEBUG AT START ----------------\n";
+echo "URI: " . $_SERVER['REQUEST_URI'] . "\n";
+echo "METHOD: " . $_SERVER['REQUEST_METHOD'] . "\n";
+echo "SESSION:\n"; print_r($_SESSION);
+echo "\nCOOKIES:\n"; print_r($_COOKIE);
+echo "\n------------------------------------------------</pre>";
+exit; 
 
 if (!isset($_SESSION['user_id'])) {
     // If no session, try to re-hydrate from cookie (Vercel/Serverless fix)

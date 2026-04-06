@@ -11,11 +11,19 @@ try {
         ip_address VARCHAR(45)
     )";
     $pdo->exec($sql);
+    
     echo "<h1>✅ Success!</h1>";
     echo "<p>The <b>debug_logs</b> table is now ready in your Aiven database.</p>";
-    echo "<p>I will now start recording your login attempts.</p>";
+    
+    // Diagnostic info
+    $db_name = $pdo->query("SELECT DATABASE()")->fetchColumn();
+    echo "<p>Connected to DB: <b>$db_name</b></p>";
+    
+    $tables = $pdo->query("SHOW TABLES")->fetchAll(PDO::FETCH_COLUMN);
+    echo "<p>Existing Tables: " . implode(', ', $tables) . "</p>";
+
 } catch (PDOException $e) {
     echo "<h1>❌ Error!</h1>";
-    echo "<p>Could not create table: " . $e->getMessage() . "</p>";
+    echo "<p>Connection failed: " . $e->getMessage() . "</p>";
 }
 ?>

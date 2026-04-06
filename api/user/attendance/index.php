@@ -1,6 +1,17 @@
 <?php
 session_set_cookie_params(['path' => '/', 'samesite' => 'Lax']);
 session_start();
+
+// THE TRUTH IN LOGIN (Total Debug):
+if (isset($_GET['debug_login'])) {
+    echo "<pre>---------------- DEBUG AT LOGIN ----------------\n";
+    echo "URI: " . $_SERVER['REQUEST_URI'] . "\n";
+    echo "SESSION:\n"; print_r($_SESSION);
+    echo "\nCOOKIES:\n"; print_r($_COOKIE);
+    echo "\n------------------------------------------------</pre>";
+    exit; 
+}
+
 // Debugging session
 // echo "Session ID: " . session_id() . "<br>";
 // echo "User ID in session: " . ($_SESSION['user_id'] ?? 'Not set') . "<br>";
