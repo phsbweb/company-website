@@ -11,21 +11,28 @@ if (isset($_SESSION['user_id'])) {
 }
 
 // Auto-login check via device token
-if (isset($_COOKIE['device_token'])) {
-    require_once 'db_connect.php';
-    $token = $_COOKIE['device_token'];
-    $stmt = $pdo->prepare("SELECT e.* FROM employees e JOIN device_tokens dt ON e.id = dt.employee_id WHERE dt.token = ?");
-    $stmt->execute([$token]);
-    $user = $stmt->fetch();
+// We skip this if trace=no_session is present to avoid infinite redirect loops
+if (!isset($_GET['trace']) || $_GET['trace'] !== 'no_session') {
+    if (isset($_COOKIE['device_token'])) {
+        require_once 'db_connect.php';
+        $token = $_COOKIE['device_token'];
+        $stmt = $pdo->prepare("SELECT e.* FROM employees e JOIN device_tokens dt ON e.id = dt.employee_id WHERE dt.token = ?");
+        $stmt->execute([$token]);
+        $user = $stmt->fetch();
 
-    if ($user) {
-        $_SESSION['user_id'] = $user['id'];
-        $_SESSION['full_name'] = $user['full_name'];
-        header("Location: dashboard.php");
-        exit;
+        if ($user) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['full_name'] = $user['full_name'];
+            header("Location: dashboard.php");
+            exit;
+        }
     }
 }
 $error = $_SESSION['error'] ?? '';
+if (isset($_GET['error'])) {
+    if ($_GET['error'] === 'invalid') $error = "Invalid username or password.";
+    if ($_GET['error'] === 'already_signed_in') $error = "This account is already active on another device.";
+}
 unset($_SESSION['error']);
 ?>
 <!DOCTYPE html>
@@ -43,13 +50,10 @@ unset($_SESSION['error']);
         <h1>PHSB Attendance</h1>
         <p style="margin-bottom: 2rem; color: #64748b;">Please login to your account</p>
 
-        <?php if (isset($_SESSION['error'])): ?>
+        <?php if ($error): ?>
             <div style="background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; border: 1px solid #fecaca;">
                 <i class="fas fa-exclamation-circle"></i> 
-                <?php 
-                    echo htmlspecialchars($_SESSION['error']); 
-                    unset($_SESSION['error']); // Clear it after showing
-                ?>
+                <?php echo htmlspecialchars($error); ?>
             </div>
         <?php endif; ?>
 
