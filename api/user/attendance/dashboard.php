@@ -6,7 +6,7 @@ if (!isset($_SESSION['user_id'])) {
     if (isset($_COOKIE['device_token'])) {
         require_once 'db_connect.php';
         log_debug($pdo, 'DASHBOARD', "No session. Re-hydrating from cookie: " . $_COOKIE['device_token']);
-        
+
         $token = $_COOKIE['device_token'];
         $stmt = $pdo->prepare("SELECT e.* FROM employees e JOIN device_tokens dt ON e.id = dt.employee_id WHERE dt.token = ?");
         $stmt->execute([$token]);
@@ -28,6 +28,14 @@ if (!isset($_SESSION['user_id'])) {
 } else {
     require_once 'db_connect.php';
     log_debug($pdo, 'DASHBOARD', "Session verified. User ID: " . $_SESSION['user_id'], $_SESSION['user_id']);
+}
+
+// DEBUG: See session state on dashboard
+if (isset($_GET['debug'])) {
+    echo "<pre>DEBUG DASHBOARD SESSION:\n";
+    print_r($_SESSION);
+    echo "</pre>";
+    exit;
 }
 
 require_once 'db_connect.php';

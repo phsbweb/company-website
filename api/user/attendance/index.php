@@ -6,10 +6,9 @@ session_start();
 // echo "User ID in session: " . ($_SESSION['user_id'] ?? 'Not set') . "<br>";
 
 if (isset($_SESSION['user_id'])) {
-    echo ($_SESSION);
-    exit;
-    header("Location: dashboard.php");
-    exit;
+    echo "<pre>DEBUG SESSION AT START:\n"; print_r($_SESSION); echo "</pre>";
+    // header("Location: dashboard.php");
+    // exit;
 }
 
 // Auto-login check via device token
@@ -25,7 +24,7 @@ if (!isset($_GET['trace']) || $_GET['trace'] !== 'no_session') {
         if ($user) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['full_name'] = $user['full_name'];
-            echo ($_SESSION);
+            echo "<pre>DEBUG SESSION AFTER RE-HYDRATION:\n"; print_r($_SESSION); echo "</pre>";
             exit;
             header("Location: dashboard.php");
             exit;
