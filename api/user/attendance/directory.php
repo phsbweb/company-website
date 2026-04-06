@@ -1,3 +1,4 @@
+<?php
 session_set_cookie_params(['path' => '/', 'samesite' => 'Lax']);
 session_start();
 if (!isset($_SESSION['user_id'])) {
@@ -164,7 +165,7 @@ $employees = $stmt->fetchAll();
             for (let i = 0; i < cards.length; i++) {
                 const name = cards[i].getElementsByTagName('h3')[0].innerText.toLowerCase();
                 const dept = cards[i].getElementsByClassName('dept-tag')[0].innerText.toLowerCase();
-                
+
                 if (name.includes(filter) || dept.includes(filter)) {
                     cards[i].style.display = "";
                 } else {

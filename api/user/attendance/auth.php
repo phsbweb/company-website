@@ -44,9 +44,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $stmt = $pdo->prepare("INSERT INTO device_tokens (employee_id, token, user_agent) VALUES (?, ?, ?)");
             $stmt->execute([$user['id'], $token, $user_agent]);
 
-            // Set cookie for 30 days
-            $cookie_set = setcookie('device_token', $token, time() + (86400 * 30), "/", "", false, true);
-            log_debug($pdo, 'AUTH', "Cookie set attempt result: " . ($cookie_set ? 'Success' : 'Fail'), $user['id']);
+            // Set cookie for 30 days - Fixed: secure = true for Vercel/HTTPS
+            $cookie_set = setcookie('device_token', $token, time() + (86400 * 30), "/", "", true, true);
+            log_debug($pdo, 'AUTH', "Cookie set attempt (Secure=true): " . ($cookie_set ? 'Success' : 'Fail'), $user['id']);
 
             session_write_close();
             log_debug($pdo, 'AUTH', "Redirecting to dashboard...", $user['id']);

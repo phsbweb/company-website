@@ -6,6 +6,8 @@ session_start();
 // echo "User ID in session: " . ($_SESSION['user_id'] ?? 'Not set') . "<br>";
 
 if (isset($_SESSION['user_id'])) {
+    echo ($_SESSION);
+    exit;
     header("Location: dashboard.php");
     exit;
 }
@@ -23,6 +25,8 @@ if (!isset($_GET['trace']) || $_GET['trace'] !== 'no_session') {
         if ($user) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['full_name'] = $user['full_name'];
+            echo ($_SESSION);
+            exit;
             header("Location: dashboard.php");
             exit;
         }
@@ -52,7 +56,7 @@ unset($_SESSION['error']);
 
         <?php if ($error): ?>
             <div style="background: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 8px; margin-bottom: 2rem; border: 1px solid #fecaca;">
-                <i class="fas fa-exclamation-circle"></i> 
+                <i class="fas fa-exclamation-circle"></i>
                 <?php echo htmlspecialchars($error); ?>
             </div>
         <?php endif; ?>
