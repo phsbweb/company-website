@@ -1,6 +1,16 @@
 <?php
 session_set_cookie_params(['path' => '/', 'samesite' => 'Lax']);
 session_start();
+
+// DEBUG: Spy at the front door!
+if (isset($_GET['debug'])) {
+    echo "<pre>DEBUG FRONT DOOR:\n";
+    echo "SESSION:\n"; print_r($_SESSION);
+    echo "\nCOOKIES:\n"; print_r($_COOKIE);
+    echo "</pre>";
+    // exit; // Uncomment to stop here if needed
+}
+
 if (!isset($_SESSION['user_id'])) {
     // If no session, try to re-hydrate from cookie (Vercel/Serverless fix)
     if (isset($_COOKIE['device_token'])) {
@@ -28,14 +38,6 @@ if (!isset($_SESSION['user_id'])) {
 } else {
     require_once 'db_connect.php';
     log_debug($pdo, 'DASHBOARD', "Session verified. User ID: " . $_SESSION['user_id'], $_SESSION['user_id']);
-}
-
-// DEBUG: See session state on dashboard
-if (isset($_GET['debug'])) {
-    echo "<pre>DEBUG DASHBOARD SESSION:\n";
-    print_r($_SESSION);
-    echo "</pre>";
-    exit;
 }
 
 require_once 'db_connect.php';
