@@ -75,7 +75,7 @@ if (empty($projects)) {
 
         <div class="feature-panels">
             <!-- Feature 1 -->
-            <div class="feature-panel" style="background-image: url('../../../user/profile_page/assets/images/safety.webp');">
+            <div class="feature-panel" style="background-image: url('../../../assets/user/profile_page/assets/images/safety.webp');">
                 <div class="feature-content">
                     <h3 class="panel-title">Safety First</h3>
                     <p class="panel-desc">We prioritize the safety of our team and clients in every project we undertake.</p>
@@ -83,7 +83,7 @@ if (empty($projects)) {
             </div>
 
             <!-- Feature 2 -->
-            <div class="feature-panel" style="background-image: url('../../../user/profile_page/assets/images/quality.webp');">
+            <div class="feature-panel" style="background-image: url('../../../assets/user/profile_page/assets/images/quality.webp');">
                 <div class="feature-content">
                     <h3 class="panel-title">Quality Construction</h3>
                     <p class="panel-desc">Using the best materials and practices to ensure structural integrity and longevity.</p>
@@ -91,7 +91,7 @@ if (empty($projects)) {
             </div>
 
             <!-- Feature 3 -->
-            <div class="feature-panel" style="background-image: url('../../../user/profile_page/assets/images/delivery.webp');">
+            <div class="feature-panel" style="background-image: url('../../../assets/user/profile_page/assets/images/delivery.webp');">
                 <div class="feature-content">
                     <h3 class="panel-title">Timely Delivery</h3>
                     <p class="panel-desc">Committed to completing projects on schedule without compromising on quality.</p>

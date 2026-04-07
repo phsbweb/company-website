@@ -42,6 +42,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Handle Filters
 $selected_date = isset($_GET['date']) ? $_GET['date'] : date('Y-m-d');
 $selected_employee = isset($_GET['employee_id']) ? $_GET['employee_id'] : '';
+$selected_date_start = null;
+$selected_date_end = null;
+
+if (!empty($selected_date)) {
+    $selected_date_start = $selected_date . ' 00:00:00';
+    $selected_date_end = date('Y-m-d H:i:s', strtotime($selected_date . ' +1 day'));
+}
 
 // Fetch Employees for Filter
 $employees = $pdo->query("SELECT id, full_name FROM employees ORDER BY full_name ASC")->fetchAll();
@@ -59,9 +66,10 @@ try {
     $count_query = "SELECT COUNT(*) FROM attendance a JOIN employees e ON a.employee_id = e.id WHERE 1=1";
     $params = [];
 
-    if ($selected_date) {
-        $count_query .= " AND DATE(a.created_at) = ?";
-        $params[] = $selected_date;
+    if ($selected_date_start && $selected_date_end) {
+        $count_query .= " AND a.created_at >= ? AND a.created_at < ?";
+        $params[] = $selected_date_start;
+        $params[] = $selected_date_end;
     }
 
     if ($selected_employee) {
@@ -81,8 +89,8 @@ try {
               WHERE 1=1";
 
     // Reuse filter conditions
-    if ($selected_date) {
-        $query .= " AND DATE(a.created_at) = ?";
+    if ($selected_date_start && $selected_date_end) {
+        $query .= " AND a.created_at >= ? AND a.created_at < ?";
     }
 
     if ($selected_employee) {
