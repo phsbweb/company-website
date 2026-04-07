@@ -1,15 +1,34 @@
 <?php
-session_start();
+require_once 'session_bootstrap.php';
+attendanceStartSession();
 if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php?trace=no_session");
-    exit;
+    // If no session, try to re-hydrate from cookie (Vercel/Serverless fix)
+    if (isset($_COOKIE['device_token'])) {
+        require_once 'db_connect.php';
+        $token = $_COOKIE['device_token'];
+        $stmt = $pdo->prepare("SELECT e.* FROM employees e JOIN device_tokens dt ON e.id = dt.employee_id WHERE dt.token = ?");
+        $stmt->execute([$token]);
+        $user = $stmt->fetch();
+
+        if ($user) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['full_name'] = $user['full_name'];
+        } else {
+            header("Location: index.php?trace=no_session");
+            exit;
+        }
+    } else {
+        header("Location: index.php?trace=no_session");
+        exit;
+    }
 }
 
 require_once 'db_connect.php';
 
 $employee_id = $_SESSION['user_id'];
-$message = "";
-$error = "";
+$message = $_SESSION['success_msg'] ?? "";
+$error = $_SESSION['error_msg'] ?? "";
+unset($_SESSION['success_msg'], $_SESSION['error_msg']);
 
 // Fetch All Holiday Ranges
 $stmt_h = $pdo->query("SELECT start_date, end_date FROM holidays");
@@ -138,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
             if ($stmt->rowCount() > 0) {
                 // Log action
-                require_once '../../admin/shared/logger.php';
+                require_once __DIR__ . '/../../admin/shared/logger.php';
                 logAction($pdo, $employee_id, $_SESSION['full_name'], 'Cancel Leave', 'Leave', $leave_id, "Employee cancelled their own pending leave request");
 
                 $_SESSION['success_msg'] = "Leave request cancelled successfully.";
@@ -165,7 +184,7 @@ $leaves = $stmt->fetchAll();
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leave Requests - Attendance System</title>
-    <link rel="stylesheet" href="../../../user/attendance/style.css">
+    <link rel="stylesheet" href="../../../assets/user/attendance/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .nav-tabs {
@@ -703,6 +722,7 @@ $leaves = $stmt->fetchAll();
         };
     </script>
     <script src="reminders.js"></script>
+    <script src="../../../assets/shared/nav-prefetch.js"></script>
 </body>
 
 </html>

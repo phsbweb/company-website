@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-require_once '../../user/attendance/db_connect.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 // Fetch approved leaves with employee and department info
 $stmt = $pdo->query("
@@ -62,7 +62,7 @@ $events_json = json_encode($events);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Company Calendar - Admin</title>
-    <link rel="stylesheet" href="../shared/style.css">
+    <link rel="stylesheet" href="../../../assets/admin/shared/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <!-- FullCalendar CDN -->
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js'></script>
@@ -172,7 +172,7 @@ $events_json = json_encode($events);
     <?php
     $activePage = 'calendar';
     $baseUrl = '../';
-    include '../shared/sidebar.php';
+include __DIR__ . '/../shared/sidebar.php';
     ?>
 
     <div class="main-content">

@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-require_once '../../user/attendance/db_connect.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 $message = $_SESSION['success_msg'] ?? "";
 $error = $_SESSION['error_msg'] ?? "";
@@ -39,7 +39,7 @@ $departments = $pdo->query("SELECT d.*, (SELECT COUNT(*) FROM employees WHERE de
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" href="../shared/style.css">
+    <link rel="stylesheet" href="../../../assets/admin/shared/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .dept-grid {
@@ -98,7 +98,7 @@ $departments = $pdo->query("SELECT d.*, (SELECT COUNT(*) FROM employees WHERE de
     <?php
     $activePage = 'departments';
     $baseUrl = '../';
-    include '../shared/sidebar.php';
+include __DIR__ . '/../shared/sidebar.php';
     ?>
 
     <div class="main-content">

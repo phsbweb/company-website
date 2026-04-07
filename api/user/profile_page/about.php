@@ -1,4 +1,4 @@
-<?php include 'includes/header.php'; ?>
+<?php include __DIR__ . '/includes/header.php'; ?>
 
 <!-- Page Header -->
 <section class="page-header snap-section">
@@ -18,7 +18,7 @@
             <div class="vm-editorial-container">
                 <!-- Left: Architectural Image -->
                 <div class="vm-image-col">
-                    <img src="../../../user/profile_page/assets/images/vm-bg.jpg" alt="Modern Architecture" class="vm-image">
+                    <img src="../../../assets/user/profile_page/assets/images/vm-bg.jpg" alt="Modern Architecture" class="vm-image">
                 </div>
 
                 <!-- Right: Overlapping Text Box -->
@@ -113,4 +113,4 @@
 
 </main>
 
-<?php include 'includes/footer.php'; ?>
+<?php include __DIR__ . '/includes/footer.php'; ?>

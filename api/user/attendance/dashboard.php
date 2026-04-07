@@ -1,8 +1,36 @@
 <?php
-session_start();
+require_once 'session_bootstrap.php';
+attendanceStartSession();
+
+
 if (!isset($_SESSION['user_id'])) {
-    header("Location: index.php?trace=no_session");
-    exit;
+    // If no session, try to re-hydrate from cookie (Vercel/Serverless fix)
+    if (isset($_COOKIE['device_token'])) {
+        require_once 'db_connect.php';
+
+        $token = $_COOKIE['device_token'];
+        $stmt = $pdo->prepare("SELECT e.* FROM employees e JOIN device_tokens dt ON e.id = dt.employee_id WHERE dt.token = ?");
+        $stmt->execute([$token]);
+        $user = $stmt->fetch();
+
+        if ($user) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['full_name'] = $user['full_name'];
+            attendanceLog('Rehydrated dashboard session from device token', [
+                'user_id' => $user['id'],
+            ]);
+        } else {
+            attendanceLog('Dashboard rehydration failed: token not found');
+            header("Location: index.php?trace=no_session");
+            exit;
+        }
+    } else {
+        attendanceLog('Dashboard missing both session and device cookie');
+        header("Location: index.php?trace=no_session");
+        exit;
+    }
+} else {
+    require_once 'db_connect.php';
 }
 
 require_once 'db_connect.php';
@@ -29,9 +57,13 @@ if ($current_status && $current_status['status'] === 'checked_in') {
         if (isset($_COOKIE['device_token'])) {
             $stmt = $pdo->prepare("DELETE FROM device_tokens WHERE token = ?");
             $stmt->execute([$_COOKIE['device_token']]);
-            setcookie('device_token', '', time() - 3600, '/');
+            attendanceClearDeviceTokenCookie();
         }
 
+        attendanceLog('Auto-logged out stale attendance session', [
+            'user_id' => $_SESSION['user_id'],
+            'attendance_id' => $current_status['id'],
+        ]);
         session_destroy();
         header("Location: index.php?trace=auto_logout");
         exit;
@@ -53,7 +85,7 @@ $shift_end = ($current_status['working_shift'] === '830-530') ? "17:30" : "17:00
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Attendance System</title>
-    <link rel="stylesheet" href="../../../user/attendance/style.css">
+    <link rel="stylesheet" href="../../../assets/user/attendance/style.css">
     <style>
         .late-badge {
             background: #fef2f2;
@@ -139,8 +171,9 @@ $shift_end = ($current_status['working_shift'] === '830-530') ? "17:30" : "17:00
             userId: <?php echo $_SESSION['user_id']; ?>
         };
     </script>
-    <script src="../../../user/attendance/script.js"></script>
-    <script src="../../../user/attendance/reminders.js"></script>
+    <script src="../../../assets/user/attendance/script.js"></script>
+    <script src="../../../assets/user/attendance/reminders.js"></script>
+    <script src="../../../assets/shared/nav-prefetch.js"></script>
 </body>
 
 </html>

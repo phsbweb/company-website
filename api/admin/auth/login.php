@@ -1,6 +1,7 @@
 <?php
-session_start();
-include '../../user/attendance/db_connect.php';
+require_once __DIR__ . '/../shared/session_bootstrap.php';
+adminStartSession();
+require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
@@ -16,14 +17,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['admin_logged_in'] = true;
                 $_SESSION['admin_user_id'] = $user['id'];
                 $_SESSION['admin_username'] = $user['username'];
+                $cookie_set = adminIssueAuthCookie($user);
+                adminLog('Admin login accepted', [
+                    'admin_user_id' => $user['id'],
+                    'username' => $user['username'],
+                    'cookie_set' => $cookie_set,
+                ]);
 
                 // Log login
-                require_once '../shared/logger.php';
+                require_once __DIR__ . '/../shared/logger.php';
                 logAction($pdo, $user['id'], $user['username'], 'Login', 'Admin', $user['id'], 'Admin logged in successfully');
 
+                session_write_close();
                 header('Location: ../dashboard/dashboard.php');
                 exit;
             } else {
+                adminClearAuthCookie();
+                adminLog('Admin login failed', [
+                    'username' => $username,
+                ]);
                 $error = "Invalid username or password.";
             }
         } catch (PDOException $e) {

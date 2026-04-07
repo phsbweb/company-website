@@ -1,14 +1,12 @@
 {
   "version": 2,
   "functions": {
-    "api/**/*.php": {
-      "runtime": "vercel-php@0.7.2"
-    }
+    "api/**/*.php": { "runtime": "vercel-php@0.7.2" }
   },
   "rewrites": [
-    { "source": "/", "destination": "/api/index.php" },
-    { "source": "/(.*\\.php)", "destination": "/api/$1" },
     { "source": "/admin/(.*\\.php)", "destination": "/api/admin/$1" },
-    { "source": "/user/(.*\\.php)", "destination": "/api/user/$1" }
+    { "source": "/user/(.*\\.php)", "destination": "/api/user/$1" },
+    { "source": "/(.*\\.php)", "destination": "/api/$1" },
+    { "source": "/", "destination": "/api/index.php" }
   ]
 }

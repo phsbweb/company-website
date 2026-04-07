@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-require_once '../../user/attendance/db_connect.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 $message = "";
 $error = "";
@@ -46,7 +46,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Add Employee - PHSB Admin</title>
-    <link rel="stylesheet" href="../shared/style.css">
+    <link rel="stylesheet" href="../../../assets/admin/shared/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .form-container {
@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php
     $activePage = 'employees';
     $baseUrl = '../';
-    include '../shared/sidebar.php';
+    include __DIR__ . '/../shared/sidebar.php';
     ?>
 
     <div class="main-content">

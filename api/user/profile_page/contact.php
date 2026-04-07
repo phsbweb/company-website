@@ -1,6 +1,6 @@
 <?php
-include 'includes/db.php';
-include 'includes/header.php';
+require_once __DIR__ . '/includes/db.php';
+include __DIR__ . '/includes/header.php';
 
 $success = false;
 $error = false;
@@ -18,10 +18,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if ($stmt->execute([$name, $email, $subject, $message, $date])) {
 
                 // --- SMTP Email Sending ---
-                require 'includes/mail_config.php';
-                require 'includes/PHPMailer/Exception.php';
-                require 'includes/PHPMailer/PHPMailer.php';
-                require 'includes/PHPMailer/SMTP.php';
+                require_once __DIR__ . '/includes/mail_config.php';
+                require_once __DIR__ . '/includes/PHPMailer/Exception.php';
+                require_once __DIR__ . '/includes/PHPMailer/PHPMailer.php';
+                require_once __DIR__ . '/includes/PHPMailer/SMTP.php';
 
                 $mail = new PHPMailer\PHPMailer\PHPMailer(true);
 
@@ -167,4 +167,4 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </section>
 
 </main>
-<?php include 'includes/footer.php'; ?>
+<?php include __DIR__ . '/includes/footer.php'; ?>

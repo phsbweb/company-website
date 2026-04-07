@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-require_once '../../user/attendance/db_connect.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 $id = $_GET['id'] ?? null;
 if (!$id) {
@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 }
 
                 // Log Change
-                require_once '../shared/logger.php';
+            require_once __DIR__ . '/../shared/logger.php';
                 logAction($pdo, $_SESSION['admin_user_id'], $_SESSION['admin_username'], 'Edit Employee', 'Employee', $id, "Updated details for $full_name ($username)");
 
                 $_SESSION['success_msg'] = "Employee updated successfully.";
@@ -75,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Employee - PHSB Admin</title>
-    <link rel="stylesheet" href="../shared/style.css">
+    <link rel="stylesheet" href="../../../assets/admin/shared/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .form-container {
@@ -109,7 +109,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php
     $activePage = 'employees';
     $baseUrl = '../';
-    include '../shared/sidebar.php';
+include __DIR__ . '/../shared/sidebar.php';
     ?>
 
     <div class="main-content">

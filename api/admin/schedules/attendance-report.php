@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-require_once '../../user/attendance/db_connect.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 // Get Parameters
 $employee_id = isset($_GET['employee_id']) ? (int)$_GET['employee_id'] : null;
@@ -28,10 +28,13 @@ $all_employees = $pdo->query("SELECT id, full_name FROM employees ORDER BY full_
 $year = date('Y', strtotime($selected_month));
 $month = date('m', strtotime($selected_month));
 $days_in_month = cal_days_in_month(CAL_GREGORIAN, $month, $year);
+$month_start = $selected_month . '-01';
+$next_month_start = date('Y-m-d', strtotime($month_start . ' +1 month'));
+$month_end = date('Y-m-d', strtotime($next_month_start . ' -1 day'));
 
 // Fetch Attendance Records for this month
-$stmt = $pdo->prepare("SELECT *, DATE(check_in) as log_date FROM attendance WHERE employee_id = ? AND DATE_FORMAT(created_at, '%Y-%m') = ? ORDER BY check_in ASC");
-$stmt->execute([$employee_id, $selected_month]);
+$stmt = $pdo->prepare("SELECT *, DATE(check_in) as log_date FROM attendance WHERE employee_id = ? AND created_at >= ? AND created_at < ? ORDER BY check_in ASC");
+$stmt->execute([$employee_id, $month_start . ' 00:00:00', $next_month_start . ' 00:00:00']);
 $raw_records = $stmt->fetchAll();
 
 // Group records by date (handling multiple logs per day if any)
@@ -44,9 +47,9 @@ foreach ($raw_records as $record) {
     $attendance_map[$date][] = $record;
 }
 
-// Fetch Approved Leaves for this month
-$stmt = $pdo->prepare("SELECT * FROM leaves WHERE employee_id = ? AND status = 'approved' AND (DATE_FORMAT(start_date, '%Y-%m') = ? OR DATE_FORMAT(end_date, '%Y-%m') = ?)");
-$stmt->execute([$employee_id, $selected_month, $selected_month]);
+// Fetch Approved Leaves overlapping this month
+$stmt = $pdo->prepare("SELECT * FROM leaves WHERE employee_id = ? AND status = 'approved' AND start_date <= ? AND end_date >= ?");
+$stmt->execute([$employee_id, $month_end, $month_start]);
 $leaves = $stmt->fetchAll();
 
 // Map leaves to dates
@@ -72,6 +75,7 @@ foreach ($leaves as $leave) {
 $days_present = count($attendance_map);
 $days_absent = 0;
 $total_seconds = 0;
+$total_ot_seconds = 0;
 
 // Helper to calculate work seconds (similar to dashboard logic)
 // Helper to calculate work seconds (returning both regular and OT seconds)
@@ -153,7 +157,7 @@ $formatted_ot_hours = "{$oth}h {$otm}m";
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Attendance Report - <?php echo htmlspecialchars($employee['full_name']); ?></title>
-    <link rel="stylesheet" href="../shared/style.css">
+    <link rel="stylesheet" href="../../../assets/admin/shared/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .report-header {
@@ -295,7 +299,7 @@ $formatted_ot_hours = "{$oth}h {$otm}m";
     <?php
     $activePage = 'attendance';
     $baseUrl = '../';
-    include '../shared/sidebar.php';
+include __DIR__ . '/../shared/sidebar.php';
     ?>
 
     <div class="main-content">

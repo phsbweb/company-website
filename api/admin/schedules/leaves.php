@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-require_once '../../user/attendance/db_connect.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 $message = $_SESSION['success_msg'] ?? "";
 $error = $_SESSION['error_msg'] ?? "";
@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $stmt->execute([$status, $leave_id]);
 
         // Log Change
-        require_once '../shared/logger.php';
+require_once __DIR__ . '/../shared/logger.php';
         logAction($pdo, $_SESSION['admin_user_id'], $_SESSION['admin_username'], ucfirst($status) . ' Leave', 'Leave', $leave_id, "Leave request status changed to $status");
 
         $_SESSION['success_msg'] = "Leave request " . ucfirst($status) . " successfully.";
@@ -113,7 +113,7 @@ if (!isset($sections[$active_tab])) {
 <html lang="en">
 
 <head>
-    <link rel="stylesheet" href="../../../admin/shared/style.css">
+    <link rel="stylesheet" href="../../../assets/admin/shared/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .leave-card {
@@ -331,7 +331,7 @@ if (!isset($sections[$active_tab])) {
     <?php
     $activePage = 'leaves';
     $baseUrl = '../';
-    include '../shared/sidebar.php';
+include __DIR__ . '/../shared/sidebar.php';
     ?>
 
     <div class="main-content">

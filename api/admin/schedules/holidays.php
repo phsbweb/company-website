@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-require_once '../../user/attendance/db_connect.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 $message = $_SESSION['success_msg'] ?? "";
 $error = $_SESSION['error_msg'] ?? "";
@@ -47,7 +47,7 @@ $holidays = $pdo->query("SELECT * FROM holidays ORDER BY start_date ASC")->fetch
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Manage Holidays - Admin</title>
-    <link rel="stylesheet" href="../shared/style.css">
+    <link rel="stylesheet" href="../../../assets/admin/shared/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         .holiday-grid {
@@ -97,7 +97,7 @@ $holidays = $pdo->query("SELECT * FROM holidays ORDER BY start_date ASC")->fetch
     <?php
     $activePage = 'holidays';
     $baseUrl = '../';
-    include '../shared/sidebar.php';
+include __DIR__ . '/../shared/sidebar.php';
     ?>
 
     <div class="main-content">

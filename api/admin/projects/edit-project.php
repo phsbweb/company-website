@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-include '../../user/profile_page/includes/db.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/profile_page/includes/db.php';
 
 $id = $_GET['id'] ?? null;
 if (!$id) {
@@ -26,18 +26,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle Image Upload
     $image_path = $project['image_path'];
     if (isset($_FILES['project_image']) && $_FILES['project_image']['error'] === UPLOAD_ERR_OK) {
-        $upload_dir = '../../user/profile_page/assets/images/projects/';
+        $upload_dir = __DIR__ . '/../../user/profile_page/assets/images/projects/';
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0777, true);
         }
 
         $file_name = time() . '_' . basename($_FILES['project_image']['name']);
-        $target_file = $upload_dir . $file_name;
+        $target_file = $upload_dir . '/' . $file_name;
 
         if (move_uploaded_file($_FILES['project_image']['tmp_name'], $target_file)) {
             // Delete old image if it exists
-            if ($image_path && file_exists('../../user/profile_page/' . $image_path)) {
-                unlink('../../user/profile_page/' . $image_path);
+            $old_image_file = __DIR__ . '/../../user/profile_page/' . $image_path;
+            if ($image_path && file_exists($old_image_file)) {
+                unlink($old_image_file);
             }
             $image_path = 'assets/images/projects/' . $file_name;
         }
@@ -59,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Project - Priority Horizon Admin</title>
-    <link rel="stylesheet" href="../shared/style.css">
+    <link rel="stylesheet" href="../../../assets/admin/shared/style.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -127,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php
     $activePage = 'projects';
     $baseUrl = '../';
-    include '../shared/sidebar.php';
+    include __DIR__ . '/../shared/sidebar.php';
     ?>
 
     <div class="main-content">

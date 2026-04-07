@@ -1,9 +1,10 @@
 <?php
-session_start();
+require_once __DIR__ . '/session_bootstrap.php';
+adminStartSession();
+adminRestoreSessionFromCookie();
 
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
-    // Dynamic redirect based on whether we are in the admin root or a subfolder
-    $redirect_url = (file_exists('auth/login.php')) ? 'auth/login.php' : '../auth/login.php';
-    header('Location: ' . $redirect_url);
+    adminLog('Admin auth guard redirected to login');
+    header('Location: ../auth/login.php');
     exit;
 }

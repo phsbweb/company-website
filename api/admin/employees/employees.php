@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-require_once '../../user/attendance/db_connect.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 // Handle Search and Pagination
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
@@ -63,7 +63,7 @@ unset($_SESSION['success_msg'], $_SESSION['error_msg']);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Employee Management - PHSB Admin</title>
-    <link rel="stylesheet" href="../../../admin/shared/style.css">
+    <link rel="stylesheet" href="../../../assets/admin/shared/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
 </head>
 
@@ -71,7 +71,7 @@ unset($_SESSION['success_msg'], $_SESSION['error_msg']);
     <?php
     $activePage = 'employees';
     $baseUrl = '../';
-    include '../shared/sidebar.php';
+include __DIR__ . '/../shared/sidebar.php';
     ?>
 
     <div class="main-content">

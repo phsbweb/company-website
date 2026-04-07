@@ -1,6 +1,7 @@
 <?php
-session_start();
-include '../../user/attendance/db_connect.php';
+require_once __DIR__ . '/../shared/session_bootstrap.php';
+adminStartSession();
+require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 if (!isset($_SESSION['reset_username'])) {
     header('Location: forgot-password.php');

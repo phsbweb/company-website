@@ -90,6 +90,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 const response = await fetch('attendance_action.php', {
                     method: 'POST',
+                    credentials: 'same-origin',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded',
                     },

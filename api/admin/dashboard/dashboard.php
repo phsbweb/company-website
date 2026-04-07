@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-include '../../user/profile_page/includes/db.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/profile_page/includes/db.php';
 
 // Fetch stats with error handling
 $projectsCount = 0;
@@ -24,17 +24,23 @@ try {
         PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
     ]);
 
-    $attendanceCount = $att_pdo->query("SELECT COUNT(*) FROM attendance WHERE DATE(created_at) = CURDATE()")->fetchColumn();
+    $todayStart = date('Y-m-d 00:00:00');
+    $tomorrowStart = date('Y-m-d 00:00:00', strtotime('+1 day'));
+
+    $stmt_count = $att_pdo->prepare("SELECT COUNT(*) FROM attendance WHERE created_at >= ? AND created_at < ?");
+    $stmt_count->execute([$todayStart, $tomorrowStart]);
+    $attendanceCount = $stmt_count->fetchColumn();
 
     // Fetch Who's In Now (Active Sessions)
-    $stmt_active = $att_pdo->query("
+    $stmt_active = $att_pdo->prepare("
         SELECT a.*, e.full_name, d.name as dept_name 
         FROM attendance a
         JOIN employees e ON a.employee_id = e.id
         LEFT JOIN departments d ON e.department_id = d.id
-        WHERE a.status = 'checked_in' AND DATE(a.check_in) = CURDATE()
+        WHERE a.status = 'checked_in' AND a.check_in >= ? AND a.check_in < ?
         ORDER BY a.check_in DESC
     ");
+    $stmt_active->execute([$todayStart, $tomorrowStart]);
     $active_sessions = $stmt_active->fetchAll();
 } catch (Exception $e) {
     $active_sessions = [];
@@ -47,7 +53,7 @@ try {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard - Priority Horizon Admin</title>
-    <link rel="stylesheet" href="../../../admin/shared/style.css">
+    <link rel="stylesheet" href="../../../assets/admin/shared/style.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -264,7 +270,7 @@ try {
     <?php
     $activePage = 'dashboard';
     $baseUrl = '../';
-    include '../shared/sidebar.php';
+include __DIR__ . '/../shared/sidebar.php';
     ?>
 
     <div class="main-content">

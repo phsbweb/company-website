@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-include '../../user/profile_page/includes/db.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/profile_page/includes/db.php';
 
 $projects = [];
 $error = false;
@@ -21,7 +21,7 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Project Management - Priority Horizon Admin</title>
     <!-- Global CSS -->
-    <link rel="stylesheet" href="../../../admin/shared/style.css">
+    <link rel="stylesheet" href="../../../assets/admin/shared/style.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -127,7 +127,7 @@ try {
     <?php
     $activePage = 'projects';
     $baseUrl = '../';
-    include '../shared/sidebar.php';
+include __DIR__ . '/../shared/sidebar.php';
     ?>
 
     <div class="main-content">

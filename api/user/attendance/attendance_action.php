@@ -1,11 +1,30 @@
 <?php
-session_start();
+require_once 'session_bootstrap.php';
+attendanceStartSession();
 require_once 'db_connect.php';
 
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id'])) {
-    echo json_encode(['success' => false, 'message' => 'Unauthorized']);
+    if (isset($_COOKIE['device_token'])) {
+        $token = $_COOKIE['device_token'];
+        $stmt = $pdo->prepare("SELECT e.* FROM employees e JOIN device_tokens dt ON e.id = dt.employee_id WHERE dt.token = ?");
+        $stmt->execute([$token]);
+        $user = $stmt->fetch();
+
+        if ($user) {
+            $_SESSION['user_id'] = $user['id'];
+            $_SESSION['full_name'] = $user['full_name'];
+            attendanceLog('Attendance action rehydrated session from device token', [
+                'user_id' => $user['id'],
+            ]);
+        }
+    }
+}
+
+if (!isset($_SESSION['user_id'])) {
+    attendanceLog('Attendance action rejected: missing session and device token');
+    echo json_encode(['success' => false, 'message' => 'Unauthorized', 'redirect' => 'index.php?trace=no_session']);
     exit;
 }
 
@@ -37,8 +56,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                     if (isset($_COOKIE['device_token'])) {
                         $stmt = $pdo->prepare("DELETE FROM device_tokens WHERE token = ?");
                         $stmt->execute([$_COOKIE['device_token']]);
-                        setcookie('device_token', '', time() - 3600, '/');
+                        attendanceClearDeviceTokenCookie();
                     }
+                    attendanceLog('Attendance action forced auto logout for stale check-in', [
+                        'user_id' => $employee_id,
+                        'attendance_id' => $last_record['id'],
+                    ]);
                     session_destroy();
                     echo json_encode(['success' => false, 'redirect' => 'index.php?trace=auto_logout', 'message' => 'Session expired. Please login again.']);
                     exit;
@@ -90,9 +113,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             if (isset($_COOKIE['device_token'])) {
                 $stmt = $pdo->prepare("DELETE FROM device_tokens WHERE token = ?");
                 $stmt->execute([$_COOKIE['device_token']]);
-                setcookie('device_token', '', time() - 3600, '/');
+                attendanceClearDeviceTokenCookie();
             }
 
+            attendanceLog('Checkout completed and session cleared', [
+                'user_id' => $employee_id,
+                'attendance_id' => $record['id'],
+            ]);
             // Auto logout: destroy session
             session_destroy();
 

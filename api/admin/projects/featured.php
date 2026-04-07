@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-include '../../user/profile_page/includes/db.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/profile_page/includes/db.php';
 
 // Handle updating featured projects
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -47,7 +47,7 @@ $featured_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Featured Projects - Priority Horizon Admin</title>
-    <link rel="stylesheet" href="../shared/style.css">
+    <link rel="stylesheet" href="../../../assets/admin/shared/style.css">
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
@@ -90,7 +90,7 @@ $featured_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
     <?php
     $activePage = 'featured';
     $baseUrl = '../';
-    include '../shared/sidebar.php';
+include __DIR__ . '/../shared/sidebar.php';
     ?>
     <div class="main-content">
         <h1 style="font-size: 1.75rem; margin-bottom: 10px;">Featured Projects</h1>
