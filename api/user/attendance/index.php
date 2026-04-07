@@ -3,10 +3,6 @@ session_set_cookie_params(['path' => '/', 'samesite' => 'Lax']);
 session_start();
 
 
-if (isset($_SESSION['user_id'])) {
-    header("Location: dashboard.php");
-    exit;
-}
 
 // Auto-login check via device token
 // We skip this if trace=no_session is present to avoid infinite redirect loops
@@ -22,8 +18,6 @@ if (!isset($_GET['trace']) && !isset($_GET['error'])) {
         if ($user) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['full_name'] = $user['full_name'];
-            header("Location: dashboard.php");
-            exit;
         }
     }
 }
