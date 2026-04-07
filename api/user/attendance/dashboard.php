@@ -1,6 +1,6 @@
 <?php
-session_set_cookie_params(['path' => '/', 'samesite' => 'Lax']);
-session_start();
+require_once 'session_bootstrap.php';
+attendanceStartSession();
 
 
 if (!isset($_SESSION['user_id'])) {
@@ -16,11 +16,16 @@ if (!isset($_SESSION['user_id'])) {
         if ($user) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['full_name'] = $user['full_name'];
+            attendanceLog('Rehydrated dashboard session from device token', [
+                'user_id' => $user['id'],
+            ]);
         } else {
+            attendanceLog('Dashboard rehydration failed: token not found');
             header("Location: index.php?trace=no_session");
             exit;
         }
     } else {
+        attendanceLog('Dashboard missing both session and device cookie');
         header("Location: index.php?trace=no_session");
         exit;
     }
@@ -52,9 +57,13 @@ if ($current_status && $current_status['status'] === 'checked_in') {
         if (isset($_COOKIE['device_token'])) {
             $stmt = $pdo->prepare("DELETE FROM device_tokens WHERE token = ?");
             $stmt->execute([$_COOKIE['device_token']]);
-            setcookie('device_token', '', time() - 3600, '/');
+            attendanceClearDeviceTokenCookie();
         }
 
+        attendanceLog('Auto-logged out stale attendance session', [
+            'user_id' => $_SESSION['user_id'],
+            'attendance_id' => $current_status['id'],
+        ]);
         session_destroy();
         header("Location: index.php?trace=auto_logout");
         exit;

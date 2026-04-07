@@ -1,6 +1,6 @@
 <?php
-session_set_cookie_params(['path' => '/', 'samesite' => 'Lax']);
-session_start();
+require_once 'session_bootstrap.php';
+attendanceStartSession();
 
 
 
@@ -18,9 +18,23 @@ if (!isset($_GET['trace']) && !isset($_GET['error'])) {
         if ($user) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['full_name'] = $user['full_name'];
+            attendanceLog('Auto-login restored session on index', [
+                'user_id' => $user['id'],
+            ]);
+            header("Location: dashboard.php");
+            exit;
         }
     }
 }
+
+if (isset($_SESSION['user_id'])) {
+    attendanceLog('Session already active on index', [
+        'user_id' => $_SESSION['user_id'],
+    ]);
+    header("Location: dashboard.php");
+    exit;
+}
+
 $error = $_SESSION['error'] ?? '';
 if (isset($_GET['error'])) {
     if ($_GET['error'] === 'invalid') $error = "Invalid username or password.";
