@@ -1,3 +1,4 @@
+<?php
 require_once 'session_bootstrap.php';
 attendanceStartSession();
 if (!isset($_SESSION['user_id'])) {
@@ -25,8 +26,9 @@ if (!isset($_SESSION['user_id'])) {
 require_once 'db_connect.php';
 
 $employee_id = $_SESSION['user_id'];
-$message = "";
-$error = "";
+$message = $_SESSION['success_msg'] ?? "";
+$error = $_SESSION['error_msg'] ?? "";
+unset($_SESSION['success_msg'], $_SESSION['error_msg']);
 
 // Fetch All Holiday Ranges
 $stmt_h = $pdo->query("SELECT start_date, end_date FROM holidays");

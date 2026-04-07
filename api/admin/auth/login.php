@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../../user/attendance/db_connect.php';
+require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = $_POST['username'] ?? '';
@@ -21,9 +21,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 require_once '../shared/logger.php';
                 logAction($pdo, $user['id'], $user['username'], 'Login', 'Admin', $user['id'], 'Admin logged in successfully');
 
-                echo '<pre>';
-                print_r($_SESSION);
-                echo '</pre>';
+                session_write_close();
+                header('Location: ../dashboard/dashboard.php');
                 exit;
             } else {
                 $error = "Invalid username or password.";

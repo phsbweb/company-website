@@ -1,6 +1,6 @@
 <?php
 session_start();
-include '../../user/attendance/db_connect.php';
+require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 if (!isset($_SESSION['otp_verified']) || !isset($_SESSION['reset_username'])) {
     header('Location: forgot-password.php');
