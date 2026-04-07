@@ -353,7 +353,7 @@ try {
     <?php
     $activePage = 'attendance';
     $baseUrl = '../';
-include __DIR__ . '/../shared/sidebar.php';
+    include __DIR__ . '/../shared/sidebar.php';
     ?>
 
     <div class="main-content">
@@ -502,7 +502,7 @@ include __DIR__ . '/../shared/sidebar.php';
                                 </td>
                                 <td style="text-align: right;">
                                     <?php if ($row['status'] === 'checked_in'): ?>
-                                        <form action="attendance.php?<?php echo htmlspecialchars($_SERVER['QUERY_STRING']); ?>" method="POST" style="display:inline;" onsubmit="return confirm('Force checkout this employee?');">
+                                        <form action="attendance.php<?php echo !empty($_SERVER['QUERY_STRING']) ? '?' . htmlspecialchars((string) $_SERVER['QUERY_STRING']) : ''; ?>" method="POST" style="display:inline;" onsubmit="return confirm('Force checkout this employee?');">
                                             <input type="hidden" name="action" value="manual_checkout">
                                             <input type="hidden" name="attendance_id" value="<?php echo $row['id']; ?>">
                                             <button type="submit" class="action-btn checkout">
