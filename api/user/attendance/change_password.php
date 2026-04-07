@@ -95,6 +95,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
             <button type="submit" class="btn">Update Password</button>
         </form>
     </div>
+    <script src="../../../assets/shared/nav-prefetch.js"></script>
 </body>
 
 </html>

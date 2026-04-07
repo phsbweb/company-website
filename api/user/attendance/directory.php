@@ -174,6 +174,7 @@ $employees = $stmt->fetchAll();
             }
         }
     </script>
+    <script src="../../../assets/shared/nav-prefetch.js"></script>
 </body>
 
 </html>

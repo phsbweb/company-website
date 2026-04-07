@@ -173,6 +173,7 @@ $shift_end = ($current_status['working_shift'] === '830-530') ? "17:30" : "17:00
     </script>
     <script src="../../../assets/user/attendance/script.js"></script>
     <script src="../../../assets/user/attendance/reminders.js"></script>
+    <script src="../../../assets/shared/nav-prefetch.js"></script>
 </body>
 
 </html>

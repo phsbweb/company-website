@@ -119,3 +119,4 @@ $pending_count = $stmt_pending->fetchColumn();
         });
     });
 </script>
+<script src="../../../assets/shared/nav-prefetch.js"></script>

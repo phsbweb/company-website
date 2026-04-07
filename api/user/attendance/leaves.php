@@ -722,6 +722,7 @@ $leaves = $stmt->fetchAll();
         };
     </script>
     <script src="reminders.js"></script>
+    <script src="../../../assets/shared/nav-prefetch.js"></script>
 </body>
 
 </html>
