@@ -1,5 +1,6 @@
 <?php
-session_start();
+require_once __DIR__ . '/../shared/session_bootstrap.php';
+adminStartSession();
 require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -16,6 +17,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['admin_logged_in'] = true;
                 $_SESSION['admin_user_id'] = $user['id'];
                 $_SESSION['admin_username'] = $user['username'];
+                adminLog('Admin login accepted', [
+                    'admin_user_id' => $user['id'],
+                    'username' => $user['username'],
+                ]);
 
                 // Log login
                 require_once __DIR__ . '/../shared/logger.php';
@@ -25,6 +30,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header('Location: ../dashboard/dashboard.php');
                 exit;
             } else {
+                adminLog('Admin login failed', [
+                    'username' => $username,
+                ]);
                 $error = "Invalid username or password.";
             }
         } catch (PDOException $e) {

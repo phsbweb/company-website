@@ -1,5 +1,6 @@
 <?php
-session_start();
+require_once __DIR__ . '/../shared/session_bootstrap.php';
+adminStartSession();
 require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 if (!isset($_SESSION['otp_verified']) || !isset($_SESSION['reset_username'])) {
@@ -26,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
                     // Success - Clear session
                     session_destroy();
-                    session_start();
+                    adminStartSession();
                     $_SESSION['success_msg'] = "Password reset successful! You can now log in.";
                     header('Location: login.php');
                     exit;
