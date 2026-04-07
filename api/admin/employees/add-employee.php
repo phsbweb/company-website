@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-require_once '../../user/attendance/db_connect.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 $message = "";
 $error = "";
@@ -80,7 +80,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php
     $activePage = 'employees';
     $baseUrl = '../';
-    include '../shared/sidebar.php';
+    include __DIR__ . '/../shared/sidebar.php';
     ?>
 
     <div class="main-content">

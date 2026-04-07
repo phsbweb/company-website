@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-include '../../user/profile_page/includes/db.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/profile_page/includes/db.php';
 
 $projects = [];
 $error = false;
@@ -127,7 +127,7 @@ try {
     <?php
     $activePage = 'projects';
     $baseUrl = '../';
-    include '../shared/sidebar.php';
+include __DIR__ . '/../shared/sidebar.php';
     ?>
 
     <div class="main-content">

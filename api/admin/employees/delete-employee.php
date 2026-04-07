@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-require_once '../../user/attendance/db_connect.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
     $id = $_POST['id'];

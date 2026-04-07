@@ -1,4 +1,4 @@
-<?php include 'includes/header.php'; ?>
+<?php include __DIR__ . '/includes/header.php'; ?>
 
 <!-- Page Header -->
 <section class="page-header snap-section">
@@ -101,4 +101,4 @@
     </section>
 
 </main>
-<?php include 'includes/footer.php'; ?>
+<?php include __DIR__ . '/includes/footer.php'; ?>

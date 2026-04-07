@@ -1,7 +1,7 @@
 <?php
-include '../shared/auth.php';
+require_once __DIR__ . '/../shared/auth.php';
 // Include the attendance database connection
-require_once '../../user/attendance/db_connect.php';
+require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 // Handle Actions (Manual Checkout, Edit Time)
 $message = $_SESSION['success_msg'] ?? "";
@@ -353,7 +353,7 @@ try {
     <?php
     $activePage = 'attendance';
     $baseUrl = '../';
-    include '../shared/sidebar.php';
+include __DIR__ . '/../shared/sidebar.php';
     ?>
 
     <div class="main-content">

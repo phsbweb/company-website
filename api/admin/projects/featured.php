@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-include '../../user/profile_page/includes/db.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/profile_page/includes/db.php';
 
 // Handle updating featured projects
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -90,7 +90,7 @@ $featured_ids = $stmt->fetchAll(PDO::FETCH_COLUMN);
     <?php
     $activePage = 'featured';
     $baseUrl = '../';
-    include '../shared/sidebar.php';
+include __DIR__ . '/../shared/sidebar.php';
     ?>
     <div class="main-content">
         <h1 style="font-size: 1.75rem; margin-bottom: 10px;">Featured Projects</h1>

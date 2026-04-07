@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-require_once '../../user/attendance/db_connect.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 // Fetch approved leaves with employee and department info
 $stmt = $pdo->query("
@@ -172,7 +172,7 @@ $events_json = json_encode($events);
     <?php
     $activePage = 'calendar';
     $baseUrl = '../';
-    include '../shared/sidebar.php';
+include __DIR__ . '/../shared/sidebar.php';
     ?>
 
     <div class="main-content">

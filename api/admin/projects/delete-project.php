@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-include '../../user/profile_page/includes/db.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/profile_page/includes/db.php';
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
@@ -10,8 +10,9 @@ if (isset($_GET['id'])) {
     $stmt->execute([$id]);
     $project = $stmt->fetch();
 
-    if ($project && $project['image_path'] && file_exists('../../user/profile_page/' . $project['image_path'])) {
-        unlink('../../user/profile_page/' . $project['image_path']);
+    $image_file = __DIR__ . '/../../user/profile_page/' . ($project['image_path'] ?? '');
+    if ($project && $project['image_path'] && file_exists($image_file)) {
+        unlink($image_file);
     }
 
     $stmt = $pdo->prepare("DELETE FROM projects WHERE id = ?");

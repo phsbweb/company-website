@@ -1,6 +1,6 @@
 <?php
-include 'includes/db.php';
-include 'includes/header.php';
+require_once __DIR__ . '/includes/db.php';
+include __DIR__ . '/includes/header.php';
 
 $projects = [];
 
@@ -142,5 +142,5 @@ if (empty($projects)) {
         </div>
     </section>
 
-    <?php include 'includes/footer.php'; ?>
+<?php include __DIR__ . '/includes/footer.php'; ?>
 </main>

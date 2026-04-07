@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-require_once '../../user/attendance/db_connect.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 // Get Parameters
 $employee_id = isset($_GET['employee_id']) ? (int)$_GET['employee_id'] : null;
@@ -295,7 +295,7 @@ $formatted_ot_hours = "{$oth}h {$otm}m";
     <?php
     $activePage = 'attendance';
     $baseUrl = '../';
-    include '../shared/sidebar.php';
+include __DIR__ . '/../shared/sidebar.php';
     ?>
 
     <div class="main-content">

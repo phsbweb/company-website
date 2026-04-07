@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-include '../../user/profile_page/includes/db.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/profile_page/includes/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = $_POST['title'] ?? '';
@@ -10,13 +10,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Handle Image Upload
     $image_path = null;
     if (isset($_FILES['project_image']) && $_FILES['project_image']['error'] === UPLOAD_ERR_OK) {
-        $upload_dir = '../../user/profile_page/assets/images/projects/';
+        $upload_dir = __DIR__ . '/../../user/profile_page/assets/images/projects/';
         if (!is_dir($upload_dir)) {
             mkdir($upload_dir, 0777, true);
         }
 
         $file_name = time() . '_' . basename($_FILES['project_image']['name']);
-        $target_file = $upload_dir . $file_name;
+        $target_file = $upload_dir . '/' . $file_name;
 
         if (move_uploaded_file($_FILES['project_image']['tmp_name'], $target_file)) {
             $image_path = 'assets/images/projects/' . $file_name;
@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <?php
     $activePage = 'projects';
     $baseUrl = '../';
-    include '../shared/sidebar.php';
+    include __DIR__ . '/../shared/sidebar.php';
     ?>
 
     <div class="main-content">

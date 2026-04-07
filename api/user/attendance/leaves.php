@@ -157,7 +157,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action']) && $_POST['
 
             if ($stmt->rowCount() > 0) {
                 // Log action
-                require_once '../../admin/shared/logger.php';
+                require_once __DIR__ . '/../../admin/shared/logger.php';
                 logAction($pdo, $employee_id, $_SESSION['full_name'], 'Cancel Leave', 'Leave', $leave_id, "Employee cancelled their own pending leave request");
 
                 $_SESSION['success_msg'] = "Leave request cancelled successfully.";

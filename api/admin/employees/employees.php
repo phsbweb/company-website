@@ -1,6 +1,6 @@
 <?php
-include '../shared/auth.php';
-require_once '../../user/attendance/db_connect.php';
+require_once __DIR__ . '/../shared/auth.php';
+require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 // Handle Search and Pagination
 $search = isset($_GET['search']) ? trim($_GET['search']) : '';
@@ -71,7 +71,7 @@ unset($_SESSION['success_msg'], $_SESSION['error_msg']);
     <?php
     $activePage = 'employees';
     $baseUrl = '../';
-    include '../shared/sidebar.php';
+include __DIR__ . '/../shared/sidebar.php';
     ?>
 
     <div class="main-content">

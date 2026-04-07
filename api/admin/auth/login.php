@@ -18,7 +18,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['admin_username'] = $user['username'];
 
                 // Log login
-                require_once '../shared/logger.php';
+                require_once __DIR__ . '/../shared/logger.php';
                 logAction($pdo, $user['id'], $user['username'], 'Login', 'Admin', $user['id'], 'Admin logged in successfully');
 
                 session_write_close();
