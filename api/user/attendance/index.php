@@ -2,29 +2,16 @@
 session_set_cookie_params(['path' => '/', 'samesite' => 'Lax']);
 session_start();
 
-// THE TRUTH IN LOGIN (Total Debug):
-if (isset($_GET['debug_login'])) {
-    echo "<pre>---------------- DEBUG AT LOGIN ----------------\n";
-    echo "URI: " . $_SERVER['REQUEST_URI'] . "\n";
-    echo "SESSION:\n"; print_r($_SESSION);
-    echo "\nCOOKIES:\n"; print_r($_COOKIE);
-    echo "\n------------------------------------------------</pre>";
-    exit; 
-}
-
-// Debugging session
-// echo "Session ID: " . session_id() . "<br>";
-// echo "User ID in session: " . ($_SESSION['user_id'] ?? 'Not set') . "<br>";
 
 if (isset($_SESSION['user_id'])) {
-    echo "<pre>DEBUG SESSION AT START:\n"; print_r($_SESSION); echo "</pre>";
-    // header("Location: dashboard.php");
-    // exit;
+    header("Location: dashboard.php");
+    exit;
 }
 
 // Auto-login check via device token
 // We skip this if trace=no_session is present to avoid infinite redirect loops
-if (!isset($_GET['trace']) || $_GET['trace'] !== 'no_session') {
+// Skip auto-login if we are just returning from an error or log out
+if (!isset($_GET['trace']) && !isset($_GET['error'])) {
     if (isset($_COOKIE['device_token'])) {
         require_once 'db_connect.php';
         $token = $_COOKIE['device_token'];
@@ -35,8 +22,6 @@ if (!isset($_GET['trace']) || $_GET['trace'] !== 'no_session') {
         if ($user) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['full_name'] = $user['full_name'];
-            echo "<pre>DEBUG SESSION AFTER RE-HYDRATION:\n"; print_r($_SESSION); echo "</pre>";
-            exit;
             header("Location: dashboard.php");
             exit;
         }

@@ -21,7 +21,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 require_once '../shared/logger.php';
                 logAction($pdo, $user['id'], $user['username'], 'Login', 'Admin', $user['id'], 'Admin logged in successfully');
 
-                header('Location: ../dashboard/dashboard.php');
+                echo '<pre>';
+                print_r($_SESSION);
+                echo '</pre>';
                 exit;
             } else {
                 $error = "Invalid username or password.";

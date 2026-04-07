@@ -8,14 +8,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
         $username = $_POST['username'] ?? '';
         $password = $_POST['password'] ?? '';
         
-        log_debug($pdo, 'AUTH', "Login attempt started for user: $username");
 
         $stmt = $pdo->prepare("SELECT * FROM employees WHERE username = ?");
         $stmt->execute([$username]);
         $user = $stmt->fetch();
 
         if ($user && password_verify($password, $user['password'])) {
-            log_debug($pdo, 'AUTH', "Password verified for user ID: " . $user['id'], $user['id']);
             
             // Punch Buddy Protection check
             $stmt = $pdo->prepare("SELECT id, user_agent FROM device_tokens WHERE employee_id = ?");
@@ -24,7 +22,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             
             if ($existing_token) {
                 if ($existing_token['user_agent'] !== $_SERVER['HTTP_USER_AGENT']) {
-                    log_debug($pdo, 'AUTH', "BLOCKED: Device mismatch. Existing: " . $existing_token['user_agent'], $user['id']);
                     $_SESSION['error'] = "already_signed_in";
                     session_write_close();
                     header("Location: index.php");
@@ -46,14 +43,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
 
             // Set cookie for 30 days - Fixed: secure = true for Vercel/HTTPS
             $cookie_set = setcookie('device_token', $token, time() + (86400 * 30), "/", "", true, true);
-            log_debug($pdo, 'AUTH', "Cookie set attempt (Secure=true): " . ($cookie_set ? 'Success' : 'Fail'), $user['id']);
 
             session_write_close();
-            log_debug($pdo, 'AUTH', "Redirecting to dashboard...", $user['id']);
-            header("Location: dashboard.php");
+            echo '<pre>';
+            print_r($_SESSION);
+            echo '</pre>';
             exit;
         } else {
-            log_debug($pdo, 'AUTH', "Login FAILED: Incorrect password or user not found.");
             $_SESSION['error'] = "Invalid username or password.";
             session_write_close();
             header("Location: index.php?trace=login_failed");

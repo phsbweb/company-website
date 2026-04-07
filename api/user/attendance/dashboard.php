@@ -2,20 +2,11 @@
 session_set_cookie_params(['path' => '/', 'samesite' => 'Lax']);
 session_start();
 
-// THE TRUTH (No if-statement, no bypasses):
-echo "<pre>---------------- DEBUG AT START ----------------\n";
-echo "URI: " . $_SERVER['REQUEST_URI'] . "\n";
-echo "METHOD: " . $_SERVER['REQUEST_METHOD'] . "\n";
-echo "SESSION:\n"; print_r($_SESSION);
-echo "\nCOOKIES:\n"; print_r($_COOKIE);
-echo "\n------------------------------------------------</pre>";
-exit; 
 
 if (!isset($_SESSION['user_id'])) {
     // If no session, try to re-hydrate from cookie (Vercel/Serverless fix)
     if (isset($_COOKIE['device_token'])) {
         require_once 'db_connect.php';
-        log_debug($pdo, 'DASHBOARD', "No session. Re-hydrating from cookie: " . $_COOKIE['device_token']);
 
         $token = $_COOKIE['device_token'];
         $stmt = $pdo->prepare("SELECT e.* FROM employees e JOIN device_tokens dt ON e.id = dt.employee_id WHERE dt.token = ?");
@@ -25,9 +16,7 @@ if (!isset($_SESSION['user_id'])) {
         if ($user) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['full_name'] = $user['full_name'];
-            log_debug($pdo, 'DASHBOARD', "SUCCESS: Re-hydrated user ID: " . $user['id'], $user['id']);
         } else {
-            log_debug($pdo, 'DASHBOARD', "FAIL: Token not found in database.");
             header("Location: index.php?trace=no_session");
             exit;
         }
@@ -37,7 +26,6 @@ if (!isset($_SESSION['user_id'])) {
     }
 } else {
     require_once 'db_connect.php';
-    log_debug($pdo, 'DASHBOARD', "Session verified. User ID: " . $_SESSION['user_id'], $_SESSION['user_id']);
 }
 
 require_once 'db_connect.php';

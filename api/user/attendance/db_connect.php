@@ -3,14 +3,6 @@ ob_start();
 require_once __DIR__ . '/../../env_loader.php';
 ob_end_clean();
 
-function log_debug($pdo, $context, $message, $user_id = null) {
-    try {
-        $stmt = $pdo->prepare("INSERT INTO debug_logs (context, message, user_id, ip_address) VALUES (?, ?, ?, ?)");
-        $stmt->execute([$context, $message, $user_id, $_SERVER['REMOTE_ADDR'] ?? 'unknown']);
-    } catch (Exception $e) {
-        // Silent fail if log table doesn't exist yet
-    }
-}
 
 date_default_timezone_set('Asia/Kuala_Lumpur');
 $host = getenv('DB_HOST') ?: 'localhost';
