@@ -4,6 +4,7 @@ adminStartSession();
 adminLog('Admin logout', [
     'admin_user_id' => $_SESSION['admin_user_id'] ?? null,
 ]);
+adminClearAuthCookie();
 session_destroy();
 header('Location: login.php');
 exit;

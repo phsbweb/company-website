@@ -17,9 +17,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $_SESSION['admin_logged_in'] = true;
                 $_SESSION['admin_user_id'] = $user['id'];
                 $_SESSION['admin_username'] = $user['username'];
+                $cookie_set = adminIssueAuthCookie($user);
                 adminLog('Admin login accepted', [
                     'admin_user_id' => $user['id'],
                     'username' => $user['username'],
+                    'cookie_set' => $cookie_set,
                 ]);
 
                 // Log login
@@ -30,6 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 header('Location: ../dashboard/dashboard.php');
                 exit;
             } else {
+                adminClearAuthCookie();
                 adminLog('Admin login failed', [
                     'username' => $username,
                 ]);

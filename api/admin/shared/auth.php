@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/session_bootstrap.php';
 adminStartSession();
+adminRestoreSessionFromCookie();
 
 if (!isset($_SESSION['admin_logged_in']) || $_SESSION['admin_logged_in'] !== true) {
     adminLog('Admin auth guard redirected to login');
