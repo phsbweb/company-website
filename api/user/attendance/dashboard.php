@@ -4,6 +4,12 @@ attendanceStartSession();
 require_once 'db_connect.php';
 
 if (!isset($_SESSION['user_id'])) {
+    if (attendanceRestoreSessionFromCookie()) {
+        // Session restored from signed cookie without a DB round trip.
+    }
+}
+
+if (!isset($_SESSION['user_id'])) {
     // If no session, try to re-hydrate from cookie (Vercel/Serverless fix)
     if (isset($_COOKIE['device_token'])) {
         $token = $_COOKIE['device_token'];

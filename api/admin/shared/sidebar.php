@@ -3,7 +3,6 @@
 $baseUrl = $baseUrl ?? '../';
 
 // Cache the pending leave count briefly so every admin page view does not query it again.
-require_once dirname(__DIR__, 2) . '/user/attendance/db_connect.php';
 $pending_count = 0;
 $pendingCountTtl = 60;
 $pendingCacheKey = 'admin_pending_leaves_count';
@@ -16,6 +15,7 @@ if (
 ) {
     $pending_count = (int) $_SESSION[$pendingCacheKey];
 } else {
+    require_once dirname(__DIR__, 2) . '/user/attendance/db_connect.php';
     $attendancePdo = attendanceDb();
     $stmt_pending = $attendancePdo->query("SELECT COUNT(*) FROM leaves WHERE status = 'pending'");
     $pending_count = (int) $stmt_pending->fetchColumn();

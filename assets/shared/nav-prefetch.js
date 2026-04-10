@@ -1,6 +1,12 @@
 (() => {
   const prefetched = new Set();
 
+  function canUsePrefetch() {
+    if (!("PointerEvent" in window)) return false;
+    if (navigator.connection?.saveData) return false;
+    return true;
+  }
+
   function canPrefetch(link) {
     if (!link || !link.href) return false;
     if (link.target && link.target !== "_self") return false;
@@ -30,12 +36,16 @@
   }
 
   function bind(link) {
-    link.addEventListener("mouseenter", () => prefetch(link), { passive: true });
-    link.addEventListener("focus", () => prefetch(link), { passive: true });
+    link.addEventListener("pointerdown", (event) => {
+      if (event.pointerType === "mouse" && event.button !== 0) return;
+      prefetch(link);
+    }, { passive: true });
+
     link.addEventListener("touchstart", () => prefetch(link), { passive: true, once: true });
   }
 
   document.addEventListener("DOMContentLoaded", () => {
+    if (!canUsePrefetch()) return;
     document.querySelectorAll("a[href]").forEach(bind);
   });
 })();

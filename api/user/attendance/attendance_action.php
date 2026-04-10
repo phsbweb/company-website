@@ -6,6 +6,10 @@ require_once 'db_connect.php';
 header('Content-Type: application/json');
 
 if (!isset($_SESSION['user_id'])) {
+    attendanceRestoreSessionFromCookie();
+}
+
+if (!isset($_SESSION['user_id'])) {
     if (isset($_COOKIE['device_token'])) {
         $token = $_COOKIE['device_token'];
         $stmt = $pdo->prepare("SELECT e.* FROM employees e JOIN device_tokens dt ON e.id = dt.employee_id WHERE dt.token = ?");
@@ -58,6 +62,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         $stmt->execute([$_COOKIE['device_token']]);
                         attendanceClearDeviceTokenCookie();
                     }
+                    attendanceClearAuthCookie();
                     attendanceLog('Attendance action forced auto logout for stale check-in', [
                         'user_id' => $employee_id,
                         'attendance_id' => $last_record['id'],
@@ -115,6 +120,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                 $stmt->execute([$_COOKIE['device_token']]);
                 attendanceClearDeviceTokenCookie();
             }
+            attendanceClearAuthCookie();
 
             attendanceLog('Checkout completed and session cleared', [
                 'user_id' => $employee_id,
