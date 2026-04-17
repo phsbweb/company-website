@@ -83,15 +83,16 @@
                     <div>
                         <h3 class="corp-info-title">Business Address</h3>
                         <p class="corp-address">
-                            11, Jalan Op 1/2, Bandar Puchong Jaya,<br>
-                            47160 Puchong, Selangor
-                        </p>
+                            No. 12, Jalan IMP 1/1, Pusat Teknologi Sinar Meranti,<br>
+                            Taman Industri Meranti Perdana,<br>
+                            47120 Puchong, Selangor Darul Ehsan.
+                        </p>
 
                         <h3 class="corp-sub-title">Company Secretary</h3>
                         <p class="corp-sec-text">
-                            <strong>Providian Management SB</strong>
-
-
+                            <strong>Providian Management SB</strong><br>
+                            11, Jalan Op 1/2, Bandar Puchong Jaya,<br>
+                            47160 Puchong, Selangor
                         </p>
                     </div>
                 </div>
