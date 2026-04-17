@@ -66,11 +66,11 @@
                             </tr>
                             <tr>
                                 <td class="corp-table-label"><strong>Registration No.</strong></td>
-                                <td>981304-U</td>
+                                <td>201201007484 (981004-U)</td>
                             </tr>
                             <tr>
                                 <td class="corp-table-label"><strong>Incorporation</strong></td>
-                                <td>5th March 2012</td>
+                                <td>6th March 2012</td>
                             </tr>
                         </table>
 
@@ -83,16 +83,15 @@
                     <div>
                         <h3 class="corp-info-title">Business Address</h3>
                         <p class="corp-address">
-                            No. 12, Jalan IMP 1/1, Pusat Teknologi Sinar Meranti,<br>
-                            Taman Industri Meranti Perdana,<br>
-                            47120 Puchong, Selangor Darul Ehsan.
-                        </p>
+                            11, Jalan Op 1/2, Bandar Puchong Jaya,<br>
+                            47160 Puchong, Selangor
+                        </p>
 
                         <h3 class="corp-sub-title">Company Secretary</h3>
                         <p class="corp-sec-text">
-                            <strong>Meridian Management Consultancy Sdn Bhd</strong><br>
-                            No 45, Pusat Perdagangan One Puchong, Jalan OP 1/2,<br>
-                            Off Jalan Puchong, 47160 Puchong, Selangor.
+                            <strong>Providian Management SB</strong>
+
+
                         </p>
                     </div>
                 </div>

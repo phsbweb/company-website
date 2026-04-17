@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             <i class="fas fa-phone-alt contact-icon"></i>
                             <div>
                                 <h4 class="contact-label">Call Us</h4>
-                                <p class="card-desc">+603-1234 5678<br>Mon-Fri, 9am - 6pm</p>
+                                <p class="card-desc">03-8052 2663<br>Mon-Fri, 9am - 6pm</p>
                             </div>
                         </div>
                     </div>
