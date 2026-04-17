@@ -8,6 +8,14 @@ attendanceStartSession();
 // We skip this if trace=no_session is present to avoid infinite redirect loops
 // Skip auto-login if we are just returning from an error or log out
 if (!isset($_GET['trace']) && !isset($_GET['error'])) {
+    if (attendanceRestoreSessionFromCookie()) {
+        attendanceLog('Auto-login restored session on index from signed auth cookie', [
+            'user_id' => $_SESSION['user_id'],
+        ]);
+        header("Location: dashboard.php");
+        exit;
+    }
+
     if (isset($_COOKIE['device_token'])) {
         require_once 'db_connect.php';
         $token = $_COOKIE['device_token'];
@@ -35,10 +43,12 @@ if (isset($_SESSION['user_id'])) {
     exit;
 }
 
-$error = $_SESSION['error'] ?? '';
-if (isset($_GET['error'])) {
-    if ($_GET['error'] === 'invalid') $error = "Invalid username or password.";
-    if ($_GET['error'] === 'already_signed_in') $error = "This account is already active on another device.";
+$errorCode = $_GET['error'] ?? ($_SESSION['error'] ?? '');
+$error = '';
+if ($errorCode === 'invalid') {
+    $error = "Invalid username or password.";
+} elseif ($errorCode === 'already_signed_in') {
+    $error = "This account is already active on another device.";
 }
 unset($_SESSION['error']);
 ?>
@@ -77,7 +87,7 @@ unset($_SESSION['error']);
         <?php endif; ?>
 
         <?php if ($error): ?>
-            <?php if ($error === 'already_signed_in'): ?>
+            <?php if ($errorCode === 'already_signed_in'): ?>
                 <script>
                     alert('this account has already been signed in');
                 </script>

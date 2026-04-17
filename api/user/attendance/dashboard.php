@@ -1,13 +1,17 @@
 <?php
 require_once 'session_bootstrap.php';
 attendanceStartSession();
+require_once 'db_connect.php';
 
+if (!isset($_SESSION['user_id'])) {
+    if (attendanceRestoreSessionFromCookie()) {
+        // Session restored from signed cookie without a DB round trip.
+    }
+}
 
 if (!isset($_SESSION['user_id'])) {
     // If no session, try to re-hydrate from cookie (Vercel/Serverless fix)
     if (isset($_COOKIE['device_token'])) {
-        require_once 'db_connect.php';
-
         $token = $_COOKIE['device_token'];
         $stmt = $pdo->prepare("SELECT e.* FROM employees e JOIN device_tokens dt ON e.id = dt.employee_id WHERE dt.token = ?");
         $stmt->execute([$token]);
@@ -29,11 +33,7 @@ if (!isset($_SESSION['user_id'])) {
         header("Location: index.php?trace=no_session");
         exit;
     }
-} else {
-    require_once 'db_connect.php';
 }
-
-require_once 'db_connect.php';
 
 // Get current attendance status
 $employee_id = $_SESSION['user_id'];

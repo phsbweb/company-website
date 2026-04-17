@@ -1,6 +1,10 @@
 require_once 'session_bootstrap.php';
 attendanceStartSession();
 if (!isset($_SESSION['user_id'])) {
+    attendanceRestoreSessionFromCookie();
+}
+
+if (!isset($_SESSION['user_id'])) {
     // If no session, try to re-hydrate from cookie (Vercel/Serverless fix)
     if (isset($_COOKIE['device_token'])) {
         require_once 'db_connect.php';

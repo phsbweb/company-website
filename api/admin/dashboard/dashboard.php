@@ -1,6 +1,7 @@
 <?php
 require_once __DIR__ . '/../shared/auth.php';
 require_once __DIR__ . '/../../user/profile_page/includes/db.php';
+require_once __DIR__ . '/../../user/attendance/db_connect.php';
 
 // Fetch stats with error handling
 $projectsCount = 0;
@@ -8,31 +9,17 @@ $attendanceCount = 0;
 
 try {
     $projectsCount = $pdo->query("SELECT COUNT(*) FROM projects")->fetchColumn();
-
-    // Connect to attendance DB for daily stats using environment variables
-    $att_host = getenv('DB_HOST') ?: 'localhost';
-    $att_port = getenv('DB_PORT');
-    if (!$att_port) {
-        $att_port = ($att_host === 'localhost') ? '3306' : '10624';
-    }
-    $att_db   = getenv('DB_NAME_ATTENDANCE') ?: 'phsb_erp';
-    $att_user = getenv('DB_USER') ?: 'root';
-    $att_pass = getenv('DB_PASS') ?: '';
-    $att_dsn = "mysql:host=$att_host;port=$att_port;dbname=$att_db;charset=utf8mb4";
-    $att_pdo = new PDO($att_dsn, $att_user, $att_pass, [
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-    ]);
+    $attendancePdo = attendanceDb();
 
     $todayStart = date('Y-m-d 00:00:00');
     $tomorrowStart = date('Y-m-d 00:00:00', strtotime('+1 day'));
 
-    $stmt_count = $att_pdo->prepare("SELECT COUNT(*) FROM attendance WHERE created_at >= ? AND created_at < ?");
+    $stmt_count = $attendancePdo->prepare("SELECT COUNT(*) FROM attendance WHERE created_at >= ? AND created_at < ?");
     $stmt_count->execute([$todayStart, $tomorrowStart]);
     $attendanceCount = $stmt_count->fetchColumn();
 
     // Fetch Who's In Now (Active Sessions)
-    $stmt_active = $att_pdo->prepare("
+    $stmt_active = $attendancePdo->prepare("
         SELECT a.*, e.full_name, d.name as dept_name 
         FROM attendance a
         JOIN employees e ON a.employee_id = e.id

@@ -31,7 +31,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
                         'user_id' => $user['id'],
                     ]);
                     session_write_close();
-                    header("Location: index.php");
+                    header("Location: index.php?error=already_signed_in");
                     exit;
                 }
                 // Same device? Clear the old one to issue a fresh one below
@@ -49,9 +49,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $stmt->execute([$user['id'], $token, $user_agent]);
 
             $cookie_set = attendanceSetDeviceTokenCookie($token);
+            $auth_cookie_set = attendanceIssueAuthCookie($user);
             attendanceLog('Issued login session and device token', [
                 'user_id' => $user['id'],
                 'cookie_set' => $cookie_set,
+                'auth_cookie_set' => $auth_cookie_set,
                 'https' => attendanceIsHttps(),
             ]);
 
@@ -59,12 +61,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             header("Location: dashboard.php");
             exit;
         } else {
-            $_SESSION['error'] = "Invalid username or password.";
+            $_SESSION['error'] = "invalid";
             attendanceLog('Login failed', [
                 'username' => $username,
             ]);
             session_write_close();
-            header("Location: index.php?trace=login_failed");
+            header("Location: index.php?error=invalid");
             exit;
         }
     }
@@ -81,6 +83,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['action'])) {
             $stmt->execute([$_COOKIE['device_token']]);
             attendanceClearDeviceTokenCookie();
         }
+        attendanceClearAuthCookie();
 
         attendanceLog('User logged out', [
             'user_id' => $_SESSION['user_id'],

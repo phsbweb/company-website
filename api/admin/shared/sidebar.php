@@ -2,10 +2,26 @@
 // Determine the base path relative to the current file
 $baseUrl = $baseUrl ?? '../';
 
-// Fetch pending leave count for notifications
-require_once dirname(__DIR__, 2) . '/user/attendance/db_connect.php';
-$stmt_pending = $pdo->query("SELECT COUNT(*) FROM leaves WHERE status = 'pending'");
-$pending_count = $stmt_pending->fetchColumn();
+// Cache the pending leave count briefly so every admin page view does not query it again.
+$pending_count = 0;
+$pendingCountTtl = 60;
+$pendingCacheKey = 'admin_pending_leaves_count';
+$pendingCacheTimeKey = 'admin_pending_leaves_count_cached_at';
+$now = time();
+
+if (
+    isset($_SESSION[$pendingCacheKey], $_SESSION[$pendingCacheTimeKey]) &&
+    ($now - (int) $_SESSION[$pendingCacheTimeKey]) < $pendingCountTtl
+) {
+    $pending_count = (int) $_SESSION[$pendingCacheKey];
+} else {
+    require_once dirname(__DIR__, 2) . '/user/attendance/db_connect.php';
+    $attendancePdo = attendanceDb();
+    $stmt_pending = $attendancePdo->query("SELECT COUNT(*) FROM leaves WHERE status = 'pending'");
+    $pending_count = (int) $stmt_pending->fetchColumn();
+    $_SESSION[$pendingCacheKey] = $pending_count;
+    $_SESSION[$pendingCacheTimeKey] = $now;
+}
 ?>
 <div class="sidebar">
     <div class="sidebar-logo-container">

@@ -19,7 +19,7 @@
                 <div class="footer-links">
                     <h4>Contact Us</h4>
                     <ul>
-                        <li><i class="fas fa-phone-alt"></i> +603-1234 5678</li>
+                        <li><i class="fas fa-phone-alt"></i> 03-8052 2663</li>
                         <li><i class="fas fa-envelope"></i> priorityhorizon@gmail.com</li>
                     </ul>
                 </div>
